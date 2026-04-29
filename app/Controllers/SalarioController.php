@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Core\Controller;
+
+class SalarioController extends Controller
+{
+    public function __construct()
+    {
+        if (!isset($_SESSION['id_usuario'])) {
+            redirecionar('auth/login');
+        }
+    }
+
+    /**
+     * Exibe página de gerenciar salário
+     */
+    public function index()
+    {
+        $id_usuario = $_SESSION['id_usuario'];
+        $salarioModel = $this->model('Salario');
+        $salario = $salarioModel->getSalario($id_usuario);
+
+        $data = [
+            'salario' => $salario,
+            'csrf_token' => $this->gerarTokenCSRF(),
+        ];
+
+        $this->view('salario/index', $data);
+    }
+
+    /**
+     * Salva ou atualiza o salário
+     */
+    public function salvar()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirecionar('salario');
+        }
+
+        $id_usuario = $_SESSION['id_usuario'];
+
+        // Validar CSRF
+        if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
+            $_SESSION['erro'] = "Solicitação inválida.";
+            redirecionar('salario');
+        }
+
+        $valor = floatval(str_replace(',', '.', $_POST['valor'] ?? 0));
+
+        if (!$this->validarValor($valor)) {
+            $_SESSION['erro'] = "Valor do salário deve ser maior que zero.";
+            redirecionar('salario');
+        }
+
+        $salarioModel = $this->model('Salario');
+        if ($salarioModel->setSalario($id_usuario, $valor)) {
+            $_SESSION['sucesso'] = "Salário atualizado com sucesso!";
+        } else {
+            $_SESSION['erro'] = "Erro ao atualizar salário.";
+        }
+
+        redirecionar('salario');
+    }
+}
