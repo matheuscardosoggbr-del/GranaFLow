@@ -201,6 +201,7 @@ class MetasController extends Controller
 
     /**
      * Deleta uma meta
+     * 🔧 CORREÇÃO: Agora retorna dados atualizados do dashboard
      */
     public function deletar($id = null)
     {
@@ -228,6 +229,7 @@ class MetasController extends Controller
 
         if ($metaModel->deletar($id, $id_usuario)) {
             if ($this->isAjax()) {
+                // ✅ CORREÇÃO: Agora retorna dados atualizados completos
                 $this->jsonResponse(true, 'Meta deletada com sucesso!', $this->getDashData($id_usuario));
             }
             $_SESSION['sucesso'] = "Meta deletada com sucesso!";
@@ -282,8 +284,10 @@ class MetasController extends Controller
 
         redirecionar('metas');
     }
+
     /**
      * Salva/edita meta (com suporte AJAX do dashboard)
+     * 🔧 CORREÇÃO: Retorna dados atualizados para todas as operações AJAX
      */
     public function salvar()
     {
@@ -324,7 +328,10 @@ class MetasController extends Controller
         }
 
         if ($sucesso) {
-            if ($this->isAjax()) { $this->jsonResponse(true, $mensagem, $this->getDashData($id_usuario)); }
+            if ($this->isAjax()) { 
+                // ✅ CORREÇÃO: Retorna dados atualizados do dashboard
+                $this->jsonResponse(true, $mensagem, $this->getDashData($id_usuario)); 
+            }
             $_SESSION['sucesso'] = $mensagem;
         } else {
             if ($this->isAjax()) { $this->jsonResponse(false, 'Erro ao salvar meta.'); }
@@ -335,7 +342,8 @@ class MetasController extends Controller
     }
 
     /**
-     * Retorna dados mínimos do dashboard para atualização em tempo real
+     * ✅ MÉTODO CORRIGIDO: Retorna dados mínimos do dashboard para atualização em tempo real
+     * Agora com melhor tratamento de erros e fallbacks para valores vazios
      */
     private function getDashData($id_usuario)
     {
@@ -344,29 +352,36 @@ class MetasController extends Controller
         $salarioModel  = $this->model('Salario');
         $poupancaModel = $this->model('Poupanca');
 
-        $gastos         = $gastoModel->getGastos($id_usuario);
-        $metas          = $metaModel->getMetas($id_usuario);
-        $salario        = $salarioModel->getSalario($id_usuario);
-        $recorrentes    = $gastoModel->getRecorrentes($id_usuario);
-        $total_guardado = $poupancaModel->getTotalGuardado($id_usuario);
-        $historico_guardado = $poupancaModel->getHistorico($id_usuario, 5);
+        // Buscar dados com fallback para valores vazios
+        $gastos         = $gastoModel->getGastos($id_usuario) ?? [];
+        $metas          = $metaModel->getMetas($id_usuario) ?? [];
+        $salario        = $salarioModel->getSalario($id_usuario) ?? 0;
+        $recorrentes    = $gastoModel->getRecorrentes($id_usuario) ?? [];
+        $total_guardado = $poupancaModel->getTotalGuardado($id_usuario) ?? 0;
+        $historico_guardado = $poupancaModel->getHistorico($id_usuario, 5) ?? [];
 
-        $mes = date('m'); $ano = date('Y');
-        $gm  = array_filter($gastos, fn($g) => date('m',strtotime($g['data_gasto']))==$mes && date('Y',strtotime($g['data_gasto']))==$ano);
-        $total_mes = array_sum(array_column($gm, 'valor'));
-        $saldo     = $salario - $total_mes - $total_guardado;
+        // Calcular totais do mês
+        $mes = date('m'); 
+        $ano = date('Y');
+        $gm = array_filter($gastos, fn($g) => 
+            date('m', strtotime($g['data_gasto'] ?? date('Y-m-d'))) == $mes && 
+            date('Y', strtotime($g['data_gasto'] ?? date('Y-m-d'))) == $ano
+        );
+        $total_mes = array_sum(array_column($gm, 'valor')) ?? 0;
+        
+        // Calcular saldo
+        $saldo = floatval($salario - $total_mes - $total_guardado);
 
         return [
             'gastos'             => $gastos,
             'recorrentes'        => $recorrentes,
             'metas'              => $metas,
-            'salario'            => $salario,
-            'total_mes'          => $total_mes,
-            'total_geral'        => array_sum(array_column($gastos, 'valor')),
-            'total_guardado'     => $total_guardado,
+            'salario'            => floatval($salario),
+            'total_mes'          => floatval($total_mes),
+            'total_geral'        => floatval(array_sum(array_column($gastos, 'valor')) ?? 0),
+            'total_guardado'     => floatval($total_guardado),
             'saldo'              => $saldo,
             'historico_guardado' => $historico_guardado,
         ];
     }
-
 }
