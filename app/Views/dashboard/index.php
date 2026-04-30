@@ -136,7 +136,7 @@
         <!-- ═══ CARDS DE RESUMO ═══ -->
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
-                <div class="card card-resumo h-100">
+                <div class="card card-resumo h-100" data-card="saldo">
                     <div class="card-body">
                         <div class="card-resumo-icon" style="background:rgba(124,106,247,0.12);color:var(--accent);">
                             <i class="bi bi-wallet2"></i>
@@ -149,7 +149,7 @@
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card card-resumo h-100">
+                <div class="card card-resumo h-100" data-card="total-mes">
                     <div class="card-body">
                         <div class="card-resumo-icon" style="background:rgba(248,113,113,0.1);color:var(--red);">
                             <i class="bi bi-calendar3"></i>
@@ -160,7 +160,7 @@
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card card-resumo h-100">
+                <div class="card card-resumo h-100" data-card="total-geral">
                     <div class="card-body">
                         <div class="card-resumo-icon" style="background:rgba(251,191,36,0.1);color:var(--yellow);">
                             <i class="bi bi-graph-up-arrow"></i>
@@ -171,7 +171,7 @@
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card card-resumo h-100">
+                <div class="card card-resumo h-100" data-card="salario">
                     <div class="card-body">
                         <div class="card-resumo-icon" style="background:rgba(52,211,153,0.1);color:var(--green);">
                             <i class="bi bi-cash-stack"></i>
@@ -237,11 +237,23 @@
                     <div class="card-body">
                         <div class="mb-3 p-3 rounded" style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.2);">
                             <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Total guardado</div>
-                            <div style="font-size:1.4rem;font-weight:700;color:var(--green);">
-                                R$ <?= number_format($total_guardado, 2, ',', '.') ?>
+                            <div data-type="guardado" style="font-size:1.4rem;font-weight:700;color:var(--green);">
+                                <span class="valor">R$ <?= number_format($total_guardado, 2, ',', '.') ?></span>
                             </div>
                         </div>
                         <form method="POST" action="<?= BASE_URL ?>dashboard/guardarAvulso" class="form-ajax">
+                            <div class="mb-3">
+                                <label class="form-label">Selecione uma Meta</label>
+                                <select class="form-select" name="id_meta">
+                                    <option value="">Guardar sem destino</option>
+                                    <?php foreach ($metas as $meta): ?>
+                                        <option value="<?= $meta['id_meta'] ?>">
+                                            <?= htmlspecialchars($meta['nome_meta']) ?> 
+                                            (R$ <?= number_format($meta['valor_guardado'], 2, ',', '.') ?> / <?= number_format($meta['valor_limite'], 2, ',', '.') ?>)
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label">Descrição</label>
                                 <input type="text" class="form-control" name="descricao" placeholder="Ex: Reserva de emergência">
@@ -428,13 +440,26 @@
                                                 <td style="color:var(--text2);"><?= htmlspecialchars($gasto['descricao'] ?? '—') ?></td>
                                                 <td><span class="valor-gasto"><?= $gasto['simbolo'] ?> <?= number_format($gasto['valor'], 2, ',', '.') ?></span></td>
                                                 <td>
-                                                    <a href="javascript:void(0);"
-                                                        class="btn btn-sm btn-outline-danger btn-delete-ajax"
-                                                        data-url="<?= BASE_URL ?>gastos/deletar/<?= $gasto['id_gasto'] ?>"
-                                                        data-id="<?= $gasto['id_gasto'] ?>"
-                                                        data-type="gasto">
-                                                        <i class="bi bi-trash3"></i>
-                                                    </a>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button class="btn btn-outline-primary btn-edit-ajax"
+                                                            data-url="<?= BASE_URL ?>gastos/editar/<?= $gasto['id_gasto'] ?>"
+                                                            data-id="<?= $gasto['id_gasto'] ?>"
+                                                            data-type="gasto"
+                                                            data-descricao="<?= htmlspecialchars($gasto['descricao'] ?? '') ?>"
+                                                            data-valor="<?= $gasto['valor'] ?>"
+                                                            data-data="<?= $gasto['data_gasto'] ?>"
+                                                            data-categoria="<?= $gasto['id_categoria'] ?? '' ?>"
+                                                            title="Editar">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger btn-delete-ajax"
+                                                            data-url="<?= BASE_URL ?>gastos/deletar/<?= $gasto['id_gasto'] ?>"
+                                                            data-id="<?= $gasto['id_gasto'] ?>"
+                                                            data-type="gasto"
+                                                            title="Deletar">
+                                                            <i class="bi bi-trash3"></i>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -459,7 +484,7 @@
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover tabela-gastos mb-0">
+                            <table class="table table-hover tabela-gastos tabela-recorrentes mb-0">
                                 <thead>
                                     <tr>
                                         <th>Dia Venc.</th>
@@ -468,6 +493,7 @@
                                         <th>Tipo</th>
                                         <th>Valor</th>
                                         <th>Última Geração</th>
+                                        <th style="width:80px;"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -501,6 +527,27 @@
                                                 <td><span style="color:var(--muted);font-size:12px;">
                                                     <?= $rec['ultima_execucao'] ? date('d/m/Y', strtotime($rec['ultima_execucao'])) : '—' ?>
                                                 </span></td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button class="btn btn-outline-primary btn-edit-ajax"
+                                                            data-url="<?= BASE_URL ?>dashboard/editarRecorrente/<?= $rec['id'] ?>"
+                                                            data-id="<?= $rec['id'] ?>"
+                                                            data-type="recorrente"
+                                                            data-descricao="<?= htmlspecialchars($rec['descricao']) ?>"
+                                                            data-valor="<?= $rec['valor'] ?>"
+                                                            data-dia="<?= $rec['dia_vencimento'] ?>"
+                                                            title="Editar">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger btn-delete-ajax"
+                                                            data-url="<?= BASE_URL ?>dashboard/deletarRecorrente/<?= $rec['id'] ?>"
+                                                            data-id="<?= $rec['id'] ?>"
+                                                            data-type="recorrente"
+                                                            title="Deletar">
+                                                            <i class="bi bi-trash3"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
@@ -566,6 +613,7 @@
                         <h6>Minhas Metas</h6>
                     </div>
                     <div class="card-body">
+                        <div id="metas-list">
                         <?php if (empty($metas)): ?>
                             <div class="empty-state">
                                 <i class="bi bi-flag"></i>
@@ -606,11 +654,24 @@
                                                     <i class="bi bi-plus-circle"></i>
                                                 </button>
                                             </form>
-                                            <a href="<?= BASE_URL ?>metas/deletar/<?= $meta['id_meta'] ?>"
-                                                class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Excluir esta meta?')">
-                                                <i class="bi bi-trash3"></i>
-                                            </a>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button class="btn btn-outline-primary btn-edit-ajax"
+                                                    data-url="<?= BASE_URL ?>metas/editar/<?= $meta['id_meta'] ?>"
+                                                    data-id="<?= $meta['id_meta'] ?>"
+                                                    data-type="meta"
+                                                    data-nome="<?= htmlspecialchars($meta['nome_meta']) ?>"
+                                                    data-limite="<?= $meta['valor_limite'] ?>"
+                                                    title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-outline-danger btn-delete-ajax"
+                                                    data-url="<?= BASE_URL ?>metas/deletar/<?= $meta['id_meta'] ?>"
+                                                    data-id="<?= $meta['id_meta'] ?>"
+                                                    data-type="meta"
+                                                    title="Deletar">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="progress-meta">
@@ -626,6 +687,7 @@
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
+                        </div><!-- /metas-list -->
                     </div>
                 </div>
             </div>
@@ -748,5 +810,112 @@
             });
         }
     </script>
+
+    <!-- ═══ MODAL: EDITAR GASTO ═══ -->
+    <div class="modal fade" id="modalEditarGasto" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background:var(--card);border:1px solid var(--border);">
+                <div class="modal-header" style="border-bottom:1px solid var(--border);">
+                    <h5 class="modal-title" style="color:var(--text1);">Editar Gasto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarGasto" class="form-ajax" method="POST">
+                        <input type="hidden" name="_ajax" value="1">
+                        <input type="hidden" name="id_gasto" id="editGastoId">
+                        <div class="mb-3">
+                            <label class="form-label">Categoria</label>
+                            <select class="form-select" name="id_categoria" id="editGastoCategoria" required>
+                                <option value="">Selecione...</option>
+                                <?php foreach ($categorias as $cat): ?>
+                                    <option value="<?= $cat['id_categoria'] ?>"><?= htmlspecialchars($cat['nome']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <input type="text" class="form-control" name="descricao" id="editGastoDescricao" required>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Valor</label>
+                                <input type="number" step="0.01" class="form-control" name="valor" id="editGastoValor" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Data</label>
+                                <input type="date" class="form-control" name="data_gasto" id="editGastoData" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check2 me-1"></i> Salvar Alterações
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MODAL: EDITAR RECORRENTE ═══ -->
+    <div class="modal fade" id="modalEditarRecorrente" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background:var(--card);border:1px solid var(--border);">
+                <div class="modal-header" style="border-bottom:1px solid var(--border);">
+                    <h5 class="modal-title" style="color:var(--text1);">Editar Gasto Recorrente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarRecorrente" class="form-ajax" method="POST">
+                        <input type="hidden" name="_ajax" value="1">
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <input type="text" class="form-control" name="descricao" id="editRecDescricao" required>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Valor</label>
+                                <input type="number" step="0.01" class="form-control" name="valor" id="editRecValor" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Dia Vencimento</label>
+                                <input type="number" class="form-control" name="dia_vencimento" id="editRecDia" min="1" max="31" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="bi bi-check2 me-1"></i> Salvar Alterações
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MODAL: EDITAR META ═══ -->
+    <div class="modal fade" id="modalEditarMeta" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background:var(--card);border:1px solid var(--border);">
+                <div class="modal-header" style="border-bottom:1px solid var(--border);">
+                    <h5 class="modal-title" style="color:var(--text1);">Editar Meta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarMeta" class="form-ajax" method="POST">
+                        <input type="hidden" name="_ajax" value="1">
+                        <input type="hidden" name="id_meta" id="editMetaId">
+                        <div class="mb-3">
+                            <label class="form-label">Nome da Meta</label>
+                            <input type="text" class="form-control" name="nome_meta" id="editMetaNome" required maxlength="50">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Valor Limite</label>
+                            <input type="number" step="0.01" class="form-control" name="valor_limite" id="editMetaLimite" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check2 me-1"></i> Salvar Alterações
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

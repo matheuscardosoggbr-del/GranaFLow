@@ -185,4 +185,35 @@ class Gasto extends Model
             }
         }
     }
+    /**
+     * Deleta um gasto recorrente
+     */
+    public function deletarRecorrente($id, $id_usuario)
+    {
+        $stmt = $this->db->prepare("DELETE FROM gastos_recorrentes WHERE id = ? AND id_usuario = ?");
+        $stmt->bind_param("ii", $id, $id_usuario);
+        return $stmt->execute() && $stmt->affected_rows > 0;
+    }
+
+    /**
+     * Atualiza um gasto recorrente
+     */
+    public function atualizarRecorrente($id, $id_usuario, $descricao, $valor, $dia_vencimento)
+    {
+        $stmt = $this->db->prepare("UPDATE gastos_recorrentes SET descricao = ?, valor = ?, dia_vencimento = ? WHERE id = ? AND id_usuario = ?");
+        $stmt->bind_param("sdiii", $descricao, $valor, $dia_vencimento, $id, $id_usuario);
+        return $stmt->execute() && $stmt->affected_rows > 0;
+    }
+
+    /**
+     * Obtém um gasto recorrente por ID
+     */
+    public function getRecorrenteById($id, $id_usuario)
+    {
+        $stmt = $this->db->prepare("SELECT r.*, c.nome as categoria FROM gastos_recorrentes r JOIN categorias c ON r.id_categoria = c.id_categoria WHERE r.id = ? AND r.id_usuario = ?");
+        $stmt->bind_param("ii", $id, $id_usuario);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
+
 }

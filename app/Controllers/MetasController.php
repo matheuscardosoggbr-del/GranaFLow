@@ -186,7 +186,7 @@ class MetasController extends Controller
         $metaModel = $this->model('Meta');
         if ($metaModel->adicionar($id_usuario, $nome, $valor)) {
             if ($this->isAjax()) {
-                $this->jsonResponse(true, 'Meta adicionada com sucesso!');
+                $this->jsonResponse(true, 'Meta adicionada com sucesso!', $this->getDashData($id_usuario));
             }
             $_SESSION['sucesso'] = "Meta adicionada com sucesso!";
         } else {
@@ -228,7 +228,7 @@ class MetasController extends Controller
 
         if ($metaModel->deletar($id, $id_usuario)) {
             if ($this->isAjax()) {
-                $this->jsonResponse(true, 'Meta deletada com sucesso!');
+                $this->jsonResponse(true, 'Meta deletada com sucesso!', $this->getDashData($id_usuario));
             }
             $_SESSION['sucesso'] = "Meta deletada com sucesso!";
         } else {
@@ -282,4 +282,91 @@ class MetasController extends Controller
 
         redirecionar('metas');
     }
+    /**
+     * Salva/edita meta (com suporte AJAX do dashboard)
+     */
+    public function salvar()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirecionar('metas');
+        }
+
+        $id_usuario = $_SESSION['id_usuario'];
+        $id_meta    = intval($_POST['id_meta'] ?? 0);
+        $nome       = $this->sanitizar($_POST['nome_meta'] ?? '');
+        $valor      = floatval(str_replace(',', '.', $_POST['valor_limite'] ?? 0));
+
+        if (empty($nome) || strlen($nome) > 50) {
+            if ($this->isAjax()) { $this->jsonResponse(false, 'Nome da meta inválido (máx 50 caracteres).'); }
+            $_SESSION['erro'] = "Nome da meta inválido.";
+            redirecionar('metas');
+        }
+
+        if ($valor <= 0) {
+            if ($this->isAjax()) { $this->jsonResponse(false, 'Valor deve ser maior que zero.'); }
+            $_SESSION['erro'] = "Valor deve ser maior que zero.";
+            redirecionar('metas');
+        }
+
+        $metaModel = $this->model('Meta');
+
+        if ($id_meta > 0) {
+            $meta = $metaModel->getMetaById($id_meta, $id_usuario);
+            if (!$meta) {
+                if ($this->isAjax()) { $this->jsonResponse(false, 'Acesso negado.'); }
+                redirecionar('metas');
+            }
+            $sucesso  = $metaModel->atualizar($id_meta, $nome, $valor, $meta['tipo'] ?? 'gasto');
+            $mensagem = 'Meta atualizada com sucesso!';
+        } else {
+            $sucesso  = $metaModel->adicionar($id_usuario, $nome, $valor);
+            $mensagem = 'Meta adicionada com sucesso!';
+        }
+
+        if ($sucesso) {
+            if ($this->isAjax()) { $this->jsonResponse(true, $mensagem, $this->getDashData($id_usuario)); }
+            $_SESSION['sucesso'] = $mensagem;
+        } else {
+            if ($this->isAjax()) { $this->jsonResponse(false, 'Erro ao salvar meta.'); }
+            $_SESSION['erro'] = "Erro ao salvar meta.";
+        }
+
+        redirecionar('metas');
+    }
+
+    /**
+     * Retorna dados mínimos do dashboard para atualização em tempo real
+     */
+    private function getDashData($id_usuario)
+    {
+        $gastoModel    = $this->model('Gasto');
+        $metaModel     = $this->model('Meta');
+        $salarioModel  = $this->model('Salario');
+        $poupancaModel = $this->model('Poupanca');
+
+        $gastos         = $gastoModel->getGastos($id_usuario);
+        $metas          = $metaModel->getMetas($id_usuario);
+        $salario        = $salarioModel->getSalario($id_usuario);
+        $recorrentes    = $gastoModel->getRecorrentes($id_usuario);
+        $total_guardado = $poupancaModel->getTotalGuardado($id_usuario);
+        $historico_guardado = $poupancaModel->getHistorico($id_usuario, 5);
+
+        $mes = date('m'); $ano = date('Y');
+        $gm  = array_filter($gastos, fn($g) => date('m',strtotime($g['data_gasto']))==$mes && date('Y',strtotime($g['data_gasto']))==$ano);
+        $total_mes = array_sum(array_column($gm, 'valor'));
+        $saldo     = $salario - $total_mes - $total_guardado;
+
+        return [
+            'gastos'             => $gastos,
+            'recorrentes'        => $recorrentes,
+            'metas'              => $metas,
+            'salario'            => $salario,
+            'total_mes'          => $total_mes,
+            'total_geral'        => array_sum(array_column($gastos, 'valor')),
+            'total_guardado'     => $total_guardado,
+            'saldo'              => $saldo,
+            'historico_guardado' => $historico_guardado,
+        ];
+    }
+
 }

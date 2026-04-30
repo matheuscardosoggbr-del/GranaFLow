@@ -35,14 +35,12 @@ class DashboardController extends Controller
         $mes_atual = date('m');
         $ano_atual = date('Y');
 
-        // Gastos pontuais do mês atual
         $gastos_mes = array_filter($gastos, function ($g) use ($mes_atual, $ano_atual) {
             return date('m', strtotime($g['data_gasto'])) == $mes_atual
                 && date('Y', strtotime($g['data_gasto'])) == $ano_atual;
         });
         $total_mes_pontuais = array_sum(array_column($gastos_mes, 'valor'));
 
-        // Recorrentes pendentes (ainda não gerados este mês)
         $total_recorrentes_pendentes = 0;
         foreach ($recorrentes as $r) {
             $ultima   = $r['ultima_execucao'] ? date('Y-m', strtotime($r['ultima_execucao'])) : null;
@@ -56,10 +54,8 @@ class DashboardController extends Controller
         $total_mes         = $total_mes_pontuais + $total_recorrentes_pendentes;
         $total_geral       = array_sum(array_column($gastos, 'valor'));
 
-        // Saldo = Salário - Gastos do mês - Dinheiro guardado
         $saldo = $salario - $total_mes - $total_guardado;
 
-        // Gráfico de Saldo Mensal (Últimos 6 meses)
         $grafico_saldo = [];
         for ($i = 5; $i >= 0; $i--) {
             $mes_ref  = date('m', strtotime("-$i months"));
@@ -83,7 +79,6 @@ class DashboardController extends Controller
             $grafico_saldo['valores'][] = $saldo_ref;
         }
 
-        // Gráfico de Metas
         $grafico_metas = [
             'labels'   => array_column($metas, 'nome_meta'),
             'limites'  => array_column($metas, 'valor_limite'),
@@ -111,39 +106,31 @@ class DashboardController extends Controller
     }
 
     /**
-     * Verifica se é requisição AJAX
+     * Endpoint AJAX: retorna dados atualizados do dashboard em JSON
      */
-    private function isAjax()
+    public function getDashboardData()
     {
-        return isset($_POST['_ajax']) || isset($_GET['_ajax']) || 
-               (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+        if (!$this->isAjax()) {
+            http_response_code(400);
+            exit;
+        }
+
+        try {
+            $data = $this->calcularDadosDashboard();
+            $this->jsonResponse(true, 'Dados atualizados', $data);
+        } catch (\Exception $e) {
+            $this->jsonResponse(false, 'Erro ao carregar dados: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Retorna resposta JSON e interrompe
+     * Calcula todos os dados do dashboard (método interno, sem conflito de nome)
      */
-    private function jsonResponse($success, $message = '', $data = [], $action = '')
-    {
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode([
-            'success' => $success,
-            'message' => $message,
-            'data' => array_merge($data, ['action' => $action]),
-            'action' => $action
-        ]);
-        exit;
-    }
-
-    /**
-     * Recalcula dados do dashboard
-     */
-    private function getDashboardData()
+    private function calcularDadosDashboard()
     {
         $id_usuario     = $_SESSION['id_usuario'];
         $gastoModel     = $this->model('Gasto');
         $metaModel      = $this->model('Meta');
-        $categoriaModel = $this->model('Categoria');
         $salarioModel   = $this->model('Salario');
         $poupancaModel  = $this->model('Poupanca');
 
@@ -152,6 +139,7 @@ class DashboardController extends Controller
         $salario        = $salarioModel->getSalario($id_usuario);
         $recorrentes    = $gastoModel->getRecorrentes($id_usuario);
         $total_guardado = $poupancaModel->getTotalGuardado($id_usuario);
+        $historico_guardado = $poupancaModel->getHistorico($id_usuario, 5);
 
         $mes_atual = date('m');
         $ano_atual = date('Y');
@@ -164,7 +152,7 @@ class DashboardController extends Controller
 
         $total_recorrentes_pendentes = 0;
         foreach ($recorrentes as $r) {
-            $ultima   = $r['ultima_execucao'] ? date('Y-m', strtotime($r['ultima_execucao'])) : null;
+            $ultima    = $r['ultima_execucao'] ? date('Y-m', strtotime($r['ultima_execucao'])) : null;
             $ja_gerado = ($ultima === date('Y-m'));
             if (!$ja_gerado) {
                 $total_recorrentes_pendentes += $r['valor'];
@@ -176,14 +164,35 @@ class DashboardController extends Controller
         $saldo       = $salario - $total_mes - $total_guardado;
 
         return [
-            'salario'        => $salario,
-            'total_mes'      => $total_mes,
-            'total_geral'    => $total_geral,
-            'total_guardado' => $total_guardado,
-            'saldo'          => $saldo,
-            'recorrentes'    => $recorrentes,
-            'metas'          => $metas,
+            'salario'            => $salario,
+            'total_mes'          => $total_mes,
+            'total_geral'        => $total_geral,
+            'total_guardado'     => $total_guardado,
+            'saldo'              => $saldo,
+            'recorrentes'        => $recorrentes,
+            'metas'              => $metas,
+            'gastos'             => $gastos,
+            'historico_guardado' => $historico_guardado,
         ];
+    }
+
+    private function isAjax()
+    {
+        return isset($_POST['_ajax']) || isset($_GET['_ajax']) ||
+               (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+    }
+
+    private function jsonResponse($success, $message = '', $data = [], $action = '')
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => $success,
+            'message' => $message,
+            'data'    => array_merge((array)$data, ['action' => $action]),
+            'action'  => $action,
+        ]);
+        exit;
     }
 
     public function salvarSalario()
@@ -194,10 +203,10 @@ class DashboardController extends Controller
                 $salarioModel->salvar($_POST['salario'], $_SESSION['id_usuario']);
 
                 if ($this->isAjax()) {
-                    $data = $this->getDashboardData();
+                    $data = $this->calcularDadosDashboard();
                     $this->jsonResponse(true, 'Salário atualizado com sucesso!', $data, 'salario');
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 if ($this->isAjax()) {
                     $this->jsonResponse(false, 'Erro ao salvar salário: ' . $e->getMessage());
                 }
@@ -222,10 +231,10 @@ class DashboardController extends Controller
                 );
 
                 if ($this->isAjax()) {
-                    $data = $this->getDashboardData();
+                    $data = $this->calcularDadosDashboard();
                     $this->jsonResponse(true, 'Gasto recorrente adicionado com sucesso!', $data, 'recorrente');
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 if ($this->isAjax()) {
                     $this->jsonResponse(false, 'Erro ao adicionar gasto recorrente: ' . $e->getMessage());
                 }
@@ -234,18 +243,47 @@ class DashboardController extends Controller
         redirecionar('dashboard');
     }
 
+    /**
+     * Guarda dinheiro diretamente em uma meta (botão + dentro das metas)
+     * Subtrai do saldo registrando em dinheiro_guardado
+     */
     public function guardarDinheiro()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             try {
-                $metaModel = $this->model('Meta');
-                $metaModel->guardarDinheiro($_POST['id_meta'], $_SESSION['id_usuario'], $_POST['valor']);
+                $id_usuario = $_SESSION['id_usuario'];
+                $valor      = floatval($_POST['valor'] ?? 0);
+                $id_meta    = intval($_POST['id_meta'] ?? 0);
+
+                if ($valor <= 0) {
+                    if ($this->isAjax()) {
+                        $this->jsonResponse(false, 'Valor deve ser maior que zero.');
+                    }
+                    redirecionar('dashboard');
+                }
+
+                $metaModel     = $this->model('Meta');
+                $poupancaModel = $this->model('Poupanca');
+
+                $meta = $metaModel->getMetaById($id_meta, $id_usuario);
+                if (!$meta) {
+                    if ($this->isAjax()) {
+                        $this->jsonResponse(false, 'Meta não encontrada.');
+                    }
+                    redirecionar('dashboard');
+                }
+
+                // Guardar na meta (atualiza valor_guardado)
+                $metaModel->guardarDinheiro($id_meta, $id_usuario, $valor);
+
+                // Registrar no historico (subtrai do saldo)
+                $poupancaModel->guardar($id_usuario, $valor, 'Guardado para: ' . $meta['nome_meta']);
 
                 if ($this->isAjax()) {
-                    $data = $this->getDashboardData();
-                    $this->jsonResponse(true, 'Dinheiro guardado com sucesso!', $data, 'meta');
+                    $data = $this->calcularDadosDashboard();
+                    $this->jsonResponse(true, 'Dinheiro guardado na meta com sucesso!', $data, 'meta');
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 if ($this->isAjax()) {
                     $this->jsonResponse(false, 'Erro ao guardar dinheiro: ' . $e->getMessage());
                 }
@@ -254,22 +292,117 @@ class DashboardController extends Controller
         redirecionar('dashboard');
     }
 
+    /**
+     * Guarda dinheiro avulso (formulário "Guardar Dinheiro")
+     * Pode opcionalmente associar a uma meta
+     */
     public function guardarAvulso()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['valor']) && $_POST['valor'] > 0) {
             try {
+                $id_usuario    = $_SESSION['id_usuario'];
+                $valor         = floatval($_POST['valor']);
+                $id_meta       = intval($_POST['id_meta'] ?? 0);
+                $descricao     = !empty($_POST['descricao']) ? $_POST['descricao'] : 'Dinheiro guardado';
+
                 $poupancaModel = $this->model('Poupanca');
-                $descricao = !empty($_POST['descricao']) ? $_POST['descricao'] : 'Dinheiro guardado';
-                $poupancaModel->guardar($_SESSION['id_usuario'], $_POST['valor'], $descricao);
+                $metaModel     = $this->model('Meta');
+
+                // Se escolheu uma meta, guardar nela também
+                if ($id_meta > 0) {
+                    $meta = $metaModel->getMetaById($id_meta, $id_usuario);
+                    if ($meta) {
+                        $metaModel->guardarDinheiro($id_meta, $id_usuario, $valor);
+                        $descricao = 'Guardado para: ' . $meta['nome_meta'];
+                    }
+                }
+
+                // Sempre registrar no historico para subtrair do saldo
+                $poupancaModel->guardar($id_usuario, $valor, $descricao);
 
                 if ($this->isAjax()) {
-                    $data = $this->getDashboardData();
+                    $data = $this->calcularDadosDashboard();
                     $this->jsonResponse(true, 'Dinheiro guardado com sucesso!', $data, 'guardado');
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 if ($this->isAjax()) {
                     $this->jsonResponse(false, 'Erro ao guardar dinheiro: ' . $e->getMessage());
                 }
+            }
+        }
+        redirecionar('dashboard');
+    }
+
+    /**
+     * Deleta um gasto recorrente
+     */
+    public function deletarRecorrente($id = null)
+    {
+        $id_usuario = $_SESSION['id_usuario'];
+        $id = intval($id ?? ($_GET['id'] ?? 0));
+
+        if ($id <= 0) {
+            if ($this->isAjax()) {
+                $this->jsonResponse(false, 'ID inválido.');
+            }
+            redirecionar('dashboard');
+        }
+
+        $gastoModel = $this->model('Gasto');
+
+        if ($gastoModel->deletarRecorrente($id, $id_usuario)) {
+            if ($this->isAjax()) {
+                $data = $this->calcularDadosDashboard();
+                $this->jsonResponse(true, 'Gasto recorrente removido com sucesso!', $data, 'recorrente');
+            }
+        } else {
+            if ($this->isAjax()) {
+                $this->jsonResponse(false, 'Erro ao remover gasto recorrente.');
+            }
+        }
+        redirecionar('dashboard');
+    }
+
+    /**
+     * Edita um gasto recorrente
+     */
+    public function editarRecorrente($id = null)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirecionar('dashboard');
+        }
+
+        $id_usuario = $_SESSION['id_usuario'];
+        $id = intval($id ?? ($_POST['id'] ?? 0));
+
+        if ($id <= 0) {
+            if ($this->isAjax()) {
+                $this->jsonResponse(false, 'ID inválido.');
+            }
+            redirecionar('dashboard');
+        }
+
+        $descricao = trim($_POST['descricao'] ?? '');
+        $valor     = floatval($_POST['valor'] ?? 0);
+        $dia       = intval($_POST['dia_vencimento'] ?? 0);
+
+        if (empty($descricao) || $valor <= 0 || $dia < 1 || $dia > 31) {
+            if ($this->isAjax()) {
+                $this->jsonResponse(false, 'Dados inválidos.');
+            }
+            redirecionar('dashboard');
+        }
+
+        $gastoModel = $this->model('Gasto');
+
+        if ($gastoModel->atualizarRecorrente($id, $id_usuario, $descricao, $valor, $dia)) {
+            if ($this->isAjax()) {
+                $data = $this->calcularDadosDashboard();
+                $this->jsonResponse(true, 'Gasto recorrente atualizado!', $data, 'recorrente');
+            }
+        } else {
+            if ($this->isAjax()) {
+                $this->jsonResponse(false, 'Erro ao atualizar gasto recorrente.');
             }
         }
         redirecionar('dashboard');

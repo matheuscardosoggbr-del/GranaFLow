@@ -189,6 +189,7 @@ class GastosController extends Controller
         }
 
         $id_usuario = $_SESSION['id_usuario'];
+        $id_gasto_edit = intval($_POST['id_gasto'] ?? 0); // para edição via modal
         $id_categoria = intval($_POST['id_categoria'] ?? 0);
         $descricao = $this->sanitizar($_POST['descricao'] ?? '');
         $valor = floatval(str_replace(',', '.', $_POST['valor'] ?? 0));
@@ -228,9 +229,59 @@ class GastosController extends Controller
         }
 
         $gastoModel = $this->model('Gasto');
+
+        // Se id_gasto_edit > 0, é edição (via modal no dashboard)
+        if ($id_gasto_edit > 0) {
+            if (!$gastoModel->pertenceAoUsuario('gastos', 'id_gasto', $id_gasto_edit, $id_usuario)) {
+                if ($this->isAjax()) { $this->jsonResponse(false, 'Acesso negado.'); }
+                redirecionar('gastos');
+            }
+            $sucesso = $gastoModel->atualizar($id_gasto_edit, $id_categoria, $descricao, $valor, $data_gasto);
+            if ($this->isAjax()) {
+                // Retornar dados atualizados do dashboard
+                $metaModel     = $this->model('Meta');
+                $salarioModel  = $this->model('Salario');
+                $poupancaModel = $this->model('Poupanca');
+                $gastos        = $gastoModel->getGastos($id_usuario);
+                $recorrentes   = $gastoModel->getRecorrentes($id_usuario);
+                $salario       = $salarioModel->getSalario($id_usuario);
+                $total_guardado = $poupancaModel->getTotalGuardado($id_usuario);
+                $metas         = $metaModel->getMetas($id_usuario);
+                $historico_guardado = $poupancaModel->getHistorico($id_usuario, 5);
+                $mes = date('m'); $ano = date('Y');
+                $gm = array_filter($gastos, fn($g) => date('m',strtotime($g['data_gasto']))==$mes && date('Y',strtotime($g['data_gasto']))==$ano);
+                $total_mes = array_sum(array_column($gm,'valor'));
+                $saldo = $salario - $total_mes - $total_guardado;
+                $this->jsonResponse(true, 'Gasto atualizado com sucesso!', [
+                    'gastos'=>$gastos,'recorrentes'=>$recorrentes,'metas'=>$metas,
+                    'salario'=>$salario,'total_mes'=>$total_mes,'total_geral'=>array_sum(array_column($gastos,'valor')),
+                    'total_guardado'=>$total_guardado,'saldo'=>$saldo,'historico_guardado'=>$historico_guardado
+                ]);
+            }
+            $_SESSION['sucesso'] = "Gasto atualizado com sucesso!";
+            redirecionar('gastos');
+        }
+
         if ($gastoModel->adicionar($id_usuario, $id_categoria, $descricao, $valor, $data_gasto)) {
             if ($this->isAjax()) {
-                $this->jsonResponse(true, 'Gasto adicionado com sucesso!');
+                $metaModel     = $this->model('Meta');
+                $salarioModel  = $this->model('Salario');
+                $poupancaModel = $this->model('Poupanca');
+                $gastos        = $gastoModel->getGastos($id_usuario);
+                $recorrentes   = $gastoModel->getRecorrentes($id_usuario);
+                $salario       = $salarioModel->getSalario($id_usuario);
+                $total_guardado = $poupancaModel->getTotalGuardado($id_usuario);
+                $metas         = $metaModel->getMetas($id_usuario);
+                $historico_guardado = $poupancaModel->getHistorico($id_usuario, 5);
+                $mes = date('m'); $ano = date('Y');
+                $gm = array_filter($gastos, fn($g) => date('m',strtotime($g['data_gasto']))==$mes && date('Y',strtotime($g['data_gasto']))==$ano);
+                $total_mes = array_sum(array_column($gm,'valor'));
+                $saldo = $salario - $total_mes - $total_guardado;
+                $this->jsonResponse(true, 'Gasto adicionado com sucesso!', [
+                    'gastos'=>$gastos,'recorrentes'=>$recorrentes,'metas'=>$metas,
+                    'salario'=>$salario,'total_mes'=>$total_mes,'total_geral'=>array_sum(array_column($gastos,'valor')),
+                    'total_guardado'=>$total_guardado,'saldo'=>$saldo,'historico_guardado'=>$historico_guardado
+                ]);
             }
             $_SESSION['sucesso'] = "Gasto adicionado com sucesso!";
         } else {
