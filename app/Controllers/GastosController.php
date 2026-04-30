@@ -238,8 +238,25 @@ class GastosController extends Controller
             }
             $sucesso = $gastoModel->atualizar($id_gasto_edit, $id_categoria, $descricao, $valor, $data_gasto);
             if ($this->isAjax()) {
-                $this->jsonResponse(true, 'Gasto atualizado com sucesso!', 
-                    $this->getDashData($id_usuario));
+                // Retornar dados atualizados do dashboard
+                $metaModel     = $this->model('Meta');
+                $salarioModel  = $this->model('Salario');
+                $poupancaModel = $this->model('Poupanca');
+                $gastos        = $gastoModel->getGastos($id_usuario);
+                $recorrentes   = $gastoModel->getRecorrentes($id_usuario);
+                $salario       = $salarioModel->getSalario($id_usuario);
+                $total_guardado = $poupancaModel->getTotalGuardado($id_usuario);
+                $metas         = $metaModel->getMetas($id_usuario);
+                $historico_guardado = $poupancaModel->getHistorico($id_usuario, 5);
+                $mes = date('m'); $ano = date('Y');
+                $gm = array_filter($gastos, fn($g) => date('m',strtotime($g['data_gasto']))==$mes && date('Y',strtotime($g['data_gasto']))==$ano);
+                $total_mes = array_sum(array_column($gm,'valor'));
+                $saldo = $salario - $total_mes - $total_guardado;
+                $this->jsonResponse(true, 'Gasto atualizado com sucesso!', [
+                    'gastos'=>$gastos,'recorrentes'=>$recorrentes,'metas'=>$metas,
+                    'salario'=>$salario,'total_mes'=>$total_mes,'total_geral'=>array_sum(array_column($gastos,'valor')),
+                    'total_guardado'=>$total_guardado,'saldo'=>$saldo,'historico_guardado'=>$historico_guardado
+                ]);
             }
             $_SESSION['sucesso'] = "Gasto atualizado com sucesso!";
             redirecionar('gastos');
@@ -247,8 +264,24 @@ class GastosController extends Controller
 
         if ($gastoModel->adicionar($id_usuario, $id_categoria, $descricao, $valor, $data_gasto)) {
             if ($this->isAjax()) {
-                $this->jsonResponse(true, 'Gasto adicionado com sucesso!', 
-                    $this->getDashData($id_usuario));
+                $metaModel     = $this->model('Meta');
+                $salarioModel  = $this->model('Salario');
+                $poupancaModel = $this->model('Poupanca');
+                $gastos        = $gastoModel->getGastos($id_usuario);
+                $recorrentes   = $gastoModel->getRecorrentes($id_usuario);
+                $salario       = $salarioModel->getSalario($id_usuario);
+                $total_guardado = $poupancaModel->getTotalGuardado($id_usuario);
+                $metas         = $metaModel->getMetas($id_usuario);
+                $historico_guardado = $poupancaModel->getHistorico($id_usuario, 5);
+                $mes = date('m'); $ano = date('Y');
+                $gm = array_filter($gastos, fn($g) => date('m',strtotime($g['data_gasto']))==$mes && date('Y',strtotime($g['data_gasto']))==$ano);
+                $total_mes = array_sum(array_column($gm,'valor'));
+                $saldo = $salario - $total_mes - $total_guardado;
+                $this->jsonResponse(true, 'Gasto adicionado com sucesso!', [
+                    'gastos'=>$gastos,'recorrentes'=>$recorrentes,'metas'=>$metas,
+                    'salario'=>$salario,'total_mes'=>$total_mes,'total_geral'=>array_sum(array_column($gastos,'valor')),
+                    'total_guardado'=>$total_guardado,'saldo'=>$saldo,'historico_guardado'=>$historico_guardado
+                ]);
             }
             $_SESSION['sucesso'] = "Gasto adicionado com sucesso!";
         } else {
@@ -263,7 +296,6 @@ class GastosController extends Controller
 
     /**
      * Deleta um gasto
-     * 🔧 CORREÇÃO: Agora retorna dados atualizados do dashboard
      */
     public function deletar($id = null)
     {
@@ -290,9 +322,7 @@ class GastosController extends Controller
 
         if ($gastoModel->deletar($id, $id_usuario)) {
             if ($this->isAjax()) {
-                // ✅ CORREÇÃO: Agora retorna dados atualizados
-                $this->jsonResponse(true, 'Gasto deletado com sucesso!', 
-                    $this->getDashData($id_usuario));
+                $this->jsonResponse(true, 'Gasto deletado com sucesso!');
             }
             $_SESSION['sucesso'] = "Gasto deletado com sucesso!";
         } else {
@@ -303,50 +333,6 @@ class GastosController extends Controller
         }
 
         redirecionar('gastos');
-    }
-
-    /**
-     * ✅ NOVO MÉTODO: Retorna dados atualizados do dashboard para AJAX
-     * Evita duplicação de código entre adicionar, editar e deletar
-     */
-    private function getDashData($id_usuario)
-    {
-        $gastoModel    = $this->model('Gasto');
-        $metaModel     = $this->model('Meta');
-        $salarioModel  = $this->model('Salario');
-        $poupancaModel = $this->model('Poupanca');
-
-        // Buscar dados do banco com fallback para valores vazios
-        $gastos         = $gastoModel->getGastos($id_usuario) ?? [];
-        $metas          = $metaModel->getMetas($id_usuario) ?? [];
-        $salario        = $salarioModel->getSalario($id_usuario) ?? 0;
-        $recorrentes    = $gastoModel->getRecorrentes($id_usuario) ?? [];
-        $total_guardado = $poupancaModel->getTotalGuardado($id_usuario) ?? 0;
-        $historico_guardado = $poupancaModel->getHistorico($id_usuario, 5) ?? [];
-
-        // Calcular totais do mês
-        $mes = date('m');
-        $ano = date('Y');
-        $gm = array_filter($gastos, fn($g) => 
-            date('m', strtotime($g['data_gasto'] ?? date('Y-m-d'))) == $mes && 
-            date('Y', strtotime($g['data_gasto'] ?? date('Y-m-d'))) == $ano
-        );
-        $total_mes = array_sum(array_column($gm, 'valor')) ?? 0;
-        
-        // Calcular saldo
-        $saldo = floatval($salario - $total_mes - $total_guardado);
-
-        return [
-            'gastos'             => $gastos,
-            'recorrentes'        => $recorrentes,
-            'metas'              => $metas,
-            'salario'            => floatval($salario),
-            'total_mes'          => floatval($total_mes),
-            'total_geral'        => floatval(array_sum(array_column($gastos, 'valor')) ?? 0),
-            'total_guardado'     => floatval($total_guardado),
-            'saldo'              => $saldo,
-            'historico_guardado' => $historico_guardado,
-        ];
     }
 }
 ;
