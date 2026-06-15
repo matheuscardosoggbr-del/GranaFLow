@@ -345,4 +345,8 @@ class GastosController extends Controller
         redirecionar('gastos');
     }
 }
+<<<<<<< HEAD
 ;
+=======
+;
+>>>>>>> d0a88aea5bd051dff277009e1271b2fe947bfa60
