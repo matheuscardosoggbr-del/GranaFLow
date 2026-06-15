@@ -130,6 +130,11 @@ class CategoriaController extends Controller
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id);
 
+        if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
+            $_SESSION['erro'] = "Solicitação inválida.";
+            redirecionar('categorias');
+        }
+
         $categoriaModel = $this->model('Categoria');
 
         // Verificar se a categoria pertence ao usuário

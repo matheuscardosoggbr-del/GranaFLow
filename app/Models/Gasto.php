@@ -9,7 +9,7 @@ class Gasto extends Model
     /**
      * Obtém todos os gastos com filtros opcionais
      */
-    public function getGastos($usuario_id, $filtro_categoria = null, $filtro_mes = null, $ordem = 'data_desc')
+    public function getGastos($usuario_id, $filtro_categoria = null, $filtro_mes = null, $ordem = 'data_desc', $busca = null)
     {
         $sql = "SELECT g.*, c.nome AS categoria, m.simbolo
                 FROM gastos g
@@ -30,6 +30,14 @@ class Gasto extends Model
             $sql .= " AND DATE_FORMAT(g.data_gasto, '%Y-%m') = ?";
             $params[] = $filtro_mes;
             $tipos .= "s";
+        }
+
+        if (!empty($busca)) {
+            $sql .= " AND (g.descricao LIKE ? OR c.nome LIKE ?)";
+            $termo = '%' . $busca . '%';
+            $params[] = $termo;
+            $params[] = $termo;
+            $tipos .= "ss";
         }
 
         // Aplicar ordenação
@@ -111,10 +119,17 @@ class Gasto extends Model
      */
     public function adicionarRecorrente($id_usuario, $id_categoria, $descricao, $valor, $dia_vencimento, $tipo = 'mensal', $quantidade = null)
     {
-        $sql = "INSERT INTO gastos_recorrentes (id_usuario, id_categoria, descricao, valor, dia_vencimento, tipo, quantidade_meses)
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("iisdisi", $id_usuario, $id_categoria, $descricao, $valor, $dia_vencimento, $tipo, $quantidade);
+        if ($tipo === 'parcelado') {
+            $sql = "INSERT INTO gastos_recorrentes (id_usuario, id_categoria, descricao, valor, dia_vencimento, tipo, quantidade_meses)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bind_param("iisdisi", $id_usuario, $id_categoria, $descricao, $valor, $dia_vencimento, $tipo, $quantidade);
+        } else {
+            $sql = "INSERT INTO gastos_recorrentes (id_usuario, id_categoria, descricao, valor, dia_vencimento, tipo)
+                    VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bind_param("iisdis", $id_usuario, $id_categoria, $descricao, $valor, $dia_vencimento, $tipo);
+        }
         return $stmt->execute();
     }
 

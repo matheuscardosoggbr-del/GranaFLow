@@ -58,13 +58,13 @@ CREATE TABLE IF NOT EXISTS categorias (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT IGNORE INTO categorias (nome, id_tipo) VALUES
-('🍔 Alimentação', 2),
-('🚗 Transporte', 2),
-('⚕️ Saúde', 2),
-('📚 Educação', 2),
-('🎬 Entretenimento', 2),
-('🛍️ Compras', 2),
-('💡 Contas', 2);
+('Alimentação', 2),
+('Transporte', 2),
+('Saúde', 2),
+('Educação', 2),
+('Entretenimento', 2),
+('Compras', 2),
+('Contas', 2);
 
 -- ============================================
 -- TABELAS DE TRANSAÇÕES

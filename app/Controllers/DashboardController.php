@@ -199,6 +199,13 @@ class DashboardController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salario'])) {
             try {
+                if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
+                    if ($this->isAjax()) {
+                        $this->jsonResponse(false, 'Solicitação inválida.');
+                    }
+                    redirecionar('dashboard');
+                }
+
                 $salarioModel = $this->model('Salario');
                 $salarioModel->salvar($_POST['salario'], $_SESSION['id_usuario']);
 
@@ -219,6 +226,26 @@ class DashboardController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             try {
+                if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
+                    if ($this->isAjax()) {
+                        $this->jsonResponse(false, 'Solicitação inválida.');
+                    }
+                    redirecionar('dashboard');
+                }
+
+                $tipo = $this->sanitizar($_POST['tipo'] ?? 'mensal');
+                $quantidade = null;
+
+                if ($tipo === 'parcelado') {
+                    $quantidade = intval($_POST['quantidade'] ?? 0);
+                    if ($quantidade < 1) {
+                        if ($this->isAjax()) {
+                            $this->jsonResponse(false, 'Quantidade de meses inválida.');
+                        }
+                        redirecionar('dashboard');
+                    }
+                }
+
                 $gastoModel = $this->model('Gasto');
                 $gastoModel->adicionarRecorrente(
                     $_SESSION['id_usuario'],
@@ -226,8 +253,8 @@ class DashboardController extends Controller
                     $_POST['descricao'],
                     $_POST['valor'],
                     $_POST['dia_vencimento'],
-                    $_POST['tipo'],
-                    $_POST['quantidade'] ?? null
+                    $tipo,
+                    $quantidade
                 );
 
                 if ($this->isAjax()) {
@@ -251,6 +278,13 @@ class DashboardController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             try {
+                if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
+                    if ($this->isAjax()) {
+                        $this->jsonResponse(false, 'Solicitação inválida.');
+                    }
+                    redirecionar('dashboard');
+                }
+
                 $id_usuario = $_SESSION['id_usuario'];
                 $valor      = floatval($_POST['valor'] ?? 0);
                 $id_meta    = intval($_POST['id_meta'] ?? 0);
@@ -300,6 +334,13 @@ class DashboardController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['valor']) && $_POST['valor'] > 0) {
             try {
+                if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
+                    if ($this->isAjax()) {
+                        $this->jsonResponse(false, 'Solicitação inválida.');
+                    }
+                    redirecionar('dashboard');
+                }
+
                 $id_usuario    = $_SESSION['id_usuario'];
                 $valor         = floatval($_POST['valor']);
                 $id_meta       = intval($_POST['id_meta'] ?? 0);
@@ -341,6 +382,13 @@ class DashboardController extends Controller
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id ?? ($_GET['id'] ?? 0));
 
+        if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
+            if ($this->isAjax()) {
+                $this->jsonResponse(false, 'Solicitação inválida.');
+            }
+            redirecionar('dashboard');
+        }
+
         if ($id <= 0) {
             if ($this->isAjax()) {
                 $this->jsonResponse(false, 'ID inválido.');
@@ -374,6 +422,13 @@ class DashboardController extends Controller
 
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id ?? ($_POST['id'] ?? 0));
+
+        if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
+            if ($this->isAjax()) {
+                $this->jsonResponse(false, 'Solicitação inválida.');
+            }
+            redirecionar('dashboard');
+        }
 
         if ($id <= 0) {
             if ($this->isAjax()) {

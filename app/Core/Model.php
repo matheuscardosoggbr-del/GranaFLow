@@ -28,7 +28,7 @@ class Model
     /**
      * Verifica se um recurso pertence ao usuário
      */
-    protected function pertenceAoUsuario($tabela, $id_coluna, $id_recurso, $id_usuario)
+    public function pertenceAoUsuario($tabela, $id_coluna, $id_recurso, $id_usuario)
     {
         $sql = "SELECT id_usuario FROM $tabela WHERE $id_coluna = ?";
         $stmt = $this->db->prepare($sql);

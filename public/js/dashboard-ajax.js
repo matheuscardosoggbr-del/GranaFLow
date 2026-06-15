@@ -38,6 +38,17 @@ class DashboardAjax {
         });
     }
 
+    async parseJsonResponse(response) {
+        const contentType = response.headers.get('content-type') || '';
+
+        if (contentType.includes('application/json')) {
+            return await response.json();
+        }
+
+        const text = await response.text();
+        throw new Error((text || 'Resposta inválida do servidor').trim().slice(0, 300));
+    }
+
     /**
      * Envia formulário via AJAX e atualiza dados em tempo real
      */
@@ -55,6 +66,12 @@ class DashboardAjax {
             const action = form.getAttribute('action');
             formData.append('_ajax', '1');
 
+            // Adicionar CSRF token se disponível
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (csrfToken && !formData.has('csrf_token')) {
+                formData.append('csrf_token', csrfToken.content);
+            }
+
             const response = await fetch(action, {
                 method: 'POST',
                 body: formData,
@@ -63,7 +80,7 @@ class DashboardAjax {
 
             if (!response.ok) throw new Error('Erro HTTP ' + response.status);
 
-            const data = await response.json();
+            const data = await this.parseJsonResponse(response);
 
             if (data.success) {
                 this.showToast(data.message || 'Operação realizada com sucesso!', 'success');
@@ -385,6 +402,8 @@ class DashboardAjax {
 
             const fd = new FormData();
             fd.append('_ajax', '1');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (csrfToken) fd.append('csrf_token', csrfToken.content);
 
             const response = await fetch(url + (url.includes('?') ? '&' : '?') + '_ajax=1', {
                 method: 'POST',
@@ -392,7 +411,7 @@ class DashboardAjax {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
 
-            const data = await response.json();
+            const data = await this.parseJsonResponse(response);
 
             if (data.success) {
                 this.showToast(data.message || 'Item deletado com sucesso!', 'success');

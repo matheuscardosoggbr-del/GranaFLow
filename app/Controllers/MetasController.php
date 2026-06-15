@@ -66,7 +66,7 @@ class MetasController extends Controller
     }
 
     /**
-     * Salva nova meta ou edita existente
+     * Salva nova meta ou edita existente (suporta formulários tradicionais e AJAX)
      */
     public function salvar()
     {
@@ -75,10 +75,15 @@ class MetasController extends Controller
         }
 
         $id_usuario = $_SESSION['id_usuario'];
+        $isAjax = $this->isAjax();
 
-        // Validar CSRF
+        // Validar CSRF para todas as requisições POST
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-            $_SESSION['erro'] = "Solicitação inválida.";
+            $erro = "Solicitação inválida (CSRF).";
+            if ($isAjax) {
+                $this->jsonResponse(false, $erro);
+            }
+            $_SESSION['erro'] = $erro;
             redirecionar('metas');
         }
 
@@ -88,18 +93,33 @@ class MetasController extends Controller
         $valor = floatval(str_replace(',', '.', $_POST['valor_limite'] ?? 0));
         $tipo = $this->sanitizar($_POST['tipo'] ?? 'gasto');
 
+        // Validação: Nome
         if (empty($nome) || strlen($nome) > 50) {
-            $_SESSION['erro'] = "Nome da meta inválido.";
+            $erro = "Nome da meta inválido (máx 50 caracteres).";
+            if ($isAjax) {
+                $this->jsonResponse(false, $erro);
+            }
+            $_SESSION['erro'] = $erro;
             redirecionar($id_meta > 0 ? "metas/editar/$id_meta" : 'metas/novo');
         }
 
+        // Validação: Valor
         if (!$this->validarValor($valor)) {
-            $_SESSION['erro'] = "Valor deve ser maior que zero.";
+            $erro = "Valor deve ser maior que zero.";
+            if ($isAjax) {
+                $this->jsonResponse(false, $erro);
+            }
+            $_SESSION['erro'] = $erro;
             redirecionar($id_meta > 0 ? "metas/editar/$id_meta" : 'metas/novo');
         }
 
-        if ($tipo !== 'gasto' && $tipo !== 'reserva') {
-            $_SESSION['erro'] = "Tipo de meta inválido.";
+        // Validação: Tipo
+        if (!in_array($tipo, ['gasto', 'reserva'])) {
+            $erro = "Tipo de meta inválido.";
+            if ($isAjax) {
+                $this->jsonResponse(false, $erro);
+            }
+            $_SESSION['erro'] = $erro;
             redirecionar('metas');
         }
 
@@ -109,7 +129,11 @@ class MetasController extends Controller
             // Editar
             $meta = $metaModel->getMetaById($id_meta, $id_usuario);
             if (!$meta) {
-                $_SESSION['erro'] = "Acesso negado.";
+                $erro = "Acesso negado.";
+                if ($isAjax) {
+                    $this->jsonResponse(false, $erro);
+                }
+                $_SESSION['erro'] = $erro;
                 redirecionar('metas');
             }
             $sucesso = $metaModel->atualizar($id_meta, $nome, $valor, $tipo);
@@ -121,9 +145,16 @@ class MetasController extends Controller
         }
 
         if ($sucesso) {
+            if ($isAjax) {
+                $this->jsonResponse(true, $mensagem, $this->getDashData($id_usuario));
+            }
             $_SESSION['sucesso'] = $mensagem;
         } else {
-            $_SESSION['erro'] = "Erro ao salvar meta.";
+            $erro = "Erro ao salvar meta.";
+            if ($isAjax) {
+                $this->jsonResponse(false, $erro);
+            }
+            $_SESSION['erro'] = $erro;
         }
 
         redirecionar('metas');
@@ -207,6 +238,14 @@ class MetasController extends Controller
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id ?? ($_GET['id'] ?? 0));
 
+        if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
+            if ($this->isAjax()) {
+                $this->jsonResponse(false, 'Solicitação inválida.');
+            }
+            $_SESSION['erro'] = "Solicitação inválida.";
+            redirecionar('metas');
+        }
+
         if ($id <= 0) {
             if ($this->isAjax()) {
                 $this->jsonResponse(false, 'ID inválido.');
@@ -282,57 +321,7 @@ class MetasController extends Controller
 
         redirecionar('metas');
     }
-    /**
-     * Salva/edita meta (com suporte AJAX do dashboard)
-     */
-    public function salvar()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirecionar('metas');
-        }
 
-        $id_usuario = $_SESSION['id_usuario'];
-        $id_meta    = intval($_POST['id_meta'] ?? 0);
-        $nome       = $this->sanitizar($_POST['nome_meta'] ?? '');
-        $valor      = floatval(str_replace(',', '.', $_POST['valor_limite'] ?? 0));
-
-        if (empty($nome) || strlen($nome) > 50) {
-            if ($this->isAjax()) { $this->jsonResponse(false, 'Nome da meta inválido (máx 50 caracteres).'); }
-            $_SESSION['erro'] = "Nome da meta inválido.";
-            redirecionar('metas');
-        }
-
-        if ($valor <= 0) {
-            if ($this->isAjax()) { $this->jsonResponse(false, 'Valor deve ser maior que zero.'); }
-            $_SESSION['erro'] = "Valor deve ser maior que zero.";
-            redirecionar('metas');
-        }
-
-        $metaModel = $this->model('Meta');
-
-        if ($id_meta > 0) {
-            $meta = $metaModel->getMetaById($id_meta, $id_usuario);
-            if (!$meta) {
-                if ($this->isAjax()) { $this->jsonResponse(false, 'Acesso negado.'); }
-                redirecionar('metas');
-            }
-            $sucesso  = $metaModel->atualizar($id_meta, $nome, $valor, $meta['tipo'] ?? 'gasto');
-            $mensagem = 'Meta atualizada com sucesso!';
-        } else {
-            $sucesso  = $metaModel->adicionar($id_usuario, $nome, $valor);
-            $mensagem = 'Meta adicionada com sucesso!';
-        }
-
-        if ($sucesso) {
-            if ($this->isAjax()) { $this->jsonResponse(true, $mensagem, $this->getDashData($id_usuario)); }
-            $_SESSION['sucesso'] = $mensagem;
-        } else {
-            if ($this->isAjax()) { $this->jsonResponse(false, 'Erro ao salvar meta.'); }
-            $_SESSION['erro'] = "Erro ao salvar meta.";
-        }
-
-        redirecionar('metas');
-    }
 
     /**
      * Retorna dados mínimos do dashboard para atualização em tempo real

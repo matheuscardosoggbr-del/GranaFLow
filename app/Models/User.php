@@ -24,6 +24,7 @@ class User extends Model
         $user = $stmt->get_result()->fetch_assoc();
 
         if ($user && password_verify($senha, $user['senha'])) {
+            session_regenerate_id(true);
             $_SESSION["id_usuario"] = $user["id_usuario"];
             $_SESSION["nome"] = $user["nome"];
             $_SESSION["email"] = $user["email"];

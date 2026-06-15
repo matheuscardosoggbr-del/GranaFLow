@@ -26,8 +26,9 @@ class GastosController extends Controller
         $filtro_categoria = $_GET['categoria'] ?? null;
         $filtro_mes = $_GET['mes'] ?? date('Y-m');
         $ordem = $_GET['ordem'] ?? 'data_desc';
+        $busca = trim($_GET['q'] ?? '');
 
-        $gastos = $gastoModel->getGastos($id_usuario, $filtro_categoria, $filtro_mes, $ordem);
+        $gastos = $gastoModel->getGastos($id_usuario, $filtro_categoria, $filtro_mes, $ordem, $busca);
         $categorias = $categoriaModel->getCategorias($id_usuario);
 
         $data = [
@@ -36,6 +37,7 @@ class GastosController extends Controller
             'filtro_categoria' => $filtro_categoria,
             'filtro_mes' => $filtro_mes,
             'ordem' => $ordem,
+            'busca' => $busca,
             'total' => array_sum(array_column($gastos, 'valor')),
         ];
 
@@ -302,6 +304,14 @@ class GastosController extends Controller
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id ?? ($_GET['id'] ?? 0));
 
+        if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
+            if ($this->isAjax()) {
+                $this->jsonResponse(false, 'Solicitação inválida.');
+            }
+            $_SESSION['erro'] = "Solicitação inválida.";
+            redirecionar('gastos');
+        }
+
         if ($id <= 0) {
             if ($this->isAjax()) {
                 $this->jsonResponse(false, 'ID inválido.');
@@ -335,3 +345,4 @@ class GastosController extends Controller
         redirecionar('gastos');
     }
 }
+;

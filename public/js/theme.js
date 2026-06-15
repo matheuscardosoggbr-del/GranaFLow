@@ -1,52 +1,97 @@
 // =======================================================
-// GranaFlow — theme.js
-// CORRIGIDO: ícones Bootstrap já carregados antes deste
-// script no <head>, então bi-* sempre renderiza corretamente.
+// GranaFlow - theme.js
+// Tema global com seletor de temas e persistência no browser
 // =======================================================
 
 (function () {
     const STORAGE_KEY = 'granaflow_theme';
 
-    // Aplica o tema ANTES do render para evitar flash
-    const saved = localStorage.getItem(STORAGE_KEY) || 'dark';
-    document.documentElement.setAttribute('data-theme', saved);
+    const THEMES = {
+        midnight: { label: 'Midnight', icon: 'moon-stars' },
+        light: { label: 'Light', icon: 'sun' },
+        ocean: { label: 'Ocean', icon: 'droplet' },
+        lavender: { label: 'Lavender', icon: 'flower1' }
+    };
 
-    document.addEventListener('DOMContentLoaded', function () {
-        // Cria o botão de toggle
-        const btn = document.createElement('button');
-        btn.id = 'theme-toggle';
-        btn.setAttribute('aria-label', 'Alternar tema');
-        _updateButton(btn, saved);
+    function applyTheme(theme) {
+        const normalized = THEMES[theme] ? theme : 'midnight';
+        document.documentElement.setAttribute('data-theme', normalized);
+        localStorage.setItem(STORAGE_KEY, normalized);
+    }
 
-        // Insere como primeiro item da navbar-nav
-        const navRight = document.querySelector('.navbar-nav');
-        if (navRight) {
+    function emitThemeChange(theme) {
+        window.dispatchEvent(new CustomEvent('granaflow:themechange', { detail: { theme } }));
+    }
+
+    function setTheme(theme) {
+        applyTheme(theme);
+        emitThemeChange(theme);
+    }
+
+    function getSavedTheme() {
+        return localStorage.getItem(STORAGE_KEY) || 'midnight';
+    }
+
+    function injectThemePicker() {
+        const host = document.querySelector('.crm-topbar-actions') || document.querySelector('.navbar-nav');
+        if (!host || document.getElementById('theme-picker')) return;
+
+        const current = document.documentElement.getAttribute('data-theme') || getSavedTheme();
+        const picker = document.createElement('div');
+        picker.id = 'theme-picker';
+        picker.className = 'theme-picker';
+        picker.innerHTML = `
+            <button type="button" class="theme-picker-toggle" aria-haspopup="listbox" aria-expanded="false">
+                <i class="bi bi-palette"></i>
+                <span>Tema</span>
+                <i class="bi bi-chevron-down"></i>
+            </button>
+            <div class="theme-picker-menu" role="listbox"></div>
+        `;
+
+        const menu = picker.querySelector('.theme-picker-menu');
+        Object.entries(THEMES).forEach(([key, cfg]) => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'theme-picker-item' + (key === current ? ' active' : '');
+            item.dataset.theme = key;
+            item.innerHTML = `<i class="bi bi-${cfg.icon}"></i><span>${cfg.label}</span>`;
+            item.addEventListener('click', () => {
+                setTheme(key);
+                picker.querySelectorAll('.theme-picker-item').forEach(btn => btn.classList.remove('active'));
+                item.classList.add('active');
+                picker.classList.remove('open');
+                picker.querySelector('.theme-picker-toggle').setAttribute('aria-expanded', 'false');
+            });
+            menu.appendChild(item);
+        });
+
+        picker.querySelector('.theme-picker-toggle').addEventListener('click', () => {
+            const open = picker.classList.toggle('open');
+            picker.querySelector('.theme-picker-toggle').setAttribute('aria-expanded', String(open));
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!picker.contains(e.target)) {
+                picker.classList.remove('open');
+                picker.querySelector('.theme-picker-toggle').setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        if (host.classList.contains('navbar-nav')) {
             const li = document.createElement('li');
             li.className = 'nav-item d-flex align-items-center me-2';
-            li.appendChild(btn);
-            navRight.insertBefore(li, navRight.firstChild);
-        }
-
-        btn.addEventListener('click', function () {
-            const current = document.documentElement.getAttribute('data-theme');
-            const next    = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem(STORAGE_KEY, next);
-            _updateButton(btn, next);
-
-            // NOVO: dispara evento para que outros scripts (ex: gráficos)
-            // possam reagir à mudança de tema se necessário.
-            window.dispatchEvent(new CustomEvent('granaflow:themechange', { detail: { theme: next } }));
-        });
-    });
-
-    function _updateButton(btn, theme) {
-        if (theme === 'dark') {
-            btn.innerHTML = '<i class="bi bi-cloud-moon"></i> <span>Claro</span>';
-            btn.title     = 'Mudar para tema claro';
+            li.appendChild(picker);
+            host.insertBefore(li, host.firstChild);
         } else {
-            btn.innerHTML = '<i class="bi bi-cloud-sun"></i> <span>Escuro</span>';
-            btn.title     = 'Mudar para tema escuro';
+            host.prepend(picker);
         }
     }
+
+    const saved = getSavedTheme();
+    applyTheme(saved);
+
+    document.addEventListener('DOMContentLoaded', function () {
+        injectThemePicker();
+    });
 })();
