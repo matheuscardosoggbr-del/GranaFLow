@@ -1,19 +1,19 @@
 <?php
 $pageTitle = $pageTitle ?? 'GranaFlow';
-$pageKicker = $pageKicker ?? 'Dashboard';
+$pageKicker = $pageKicker ?? 'Painel';
 $pageHeading = $pageHeading ?? $pageTitle;
 $activePage = $activePage ?? 'dashboard';
-$userName = $nome_usuario ?? ($_SESSION['nome_usuario'] ?? ($_SESSION['nome'] ?? 'Usuário'));
+$userName = $nome_usuario ?? ($_SESSION['nome_usuario'] ?? ($_SESSION['nome'] ?? 'Usuario'));
 $userEmail = $_SESSION['email'] ?? '';
 
 $navItems = [
-    'dashboard' => ['label' => 'Dashboard', 'icon' => 'house-door', 'href' => BASE_URL . 'dashboard'],
+    'dashboard' => ['label' => 'Painel', 'icon' => 'house-door', 'href' => BASE_URL . 'dashboard'],
     'gastos' => ['label' => 'Gastos', 'icon' => 'receipt', 'href' => BASE_URL . 'gastos'],
     'receitas' => ['label' => 'Receitas', 'icon' => 'cash-coin', 'href' => BASE_URL . 'receitas'],
     'metas' => ['label' => 'Metas', 'icon' => 'bullseye', 'href' => BASE_URL . 'metas'],
     'categorias' => ['label' => 'Categorias', 'icon' => 'tags', 'href' => BASE_URL . 'categorias'],
-    'relatorios' => ['label' => 'Relatórios', 'icon' => 'bar-chart', 'href' => BASE_URL . 'relatorio'],
-    'salario' => ['label' => 'Salário', 'icon' => 'cash-stack', 'href' => BASE_URL . 'salario'],
+    'relatorios' => ['label' => 'Relatorios', 'icon' => 'bar-chart', 'href' => BASE_URL . 'relatorio'],
+    'salario' => ['label' => 'Salario', 'icon' => 'cash-stack', 'href' => BASE_URL . 'salario'],
 ];
 ?>
 <!DOCTYPE html>
@@ -21,7 +21,7 @@ $navItems = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle) ?> — GranaFlow</title>
+    <title><?= htmlspecialchars($pageTitle) ?> - GranaFlow</title>
     <script src="<?= BASE_URL ?>js/theme.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -38,7 +38,7 @@ $navItems = [
                 <div class="crm-brand-mark"><i class="bi bi-graph-up-arrow"></i></div>
                 <div>
                     <div class="crm-brand-name">GranaFlow</div>
-                    <div class="crm-brand-sub">Finance CRM</div>
+                    <div class="crm-brand-sub">Gestao Financeira</div>
                 </div>
             </div>
 
@@ -48,7 +48,7 @@ $navItems = [
             </label>
 
             <div class="crm-sidebar-section">
-                <div class="crm-sidebar-title">Workspace</div>
+                <div class="crm-sidebar-title">Area de trabalho</div>
                 <?php foreach ($navItems as $key => $item): ?>
                     <a class="crm-nav-item <?= $activePage === $key ? 'active' : '' ?>" href="<?= htmlspecialchars($item['href']) ?>">
                         <i class="bi bi-<?= htmlspecialchars($item['icon']) ?>"></i>
@@ -74,26 +74,26 @@ $navItems = [
                         <input type="search" placeholder="Buscar dados financeiros..." aria-label="Buscar dados financeiros" data-global-search>
                     </label>
                     <div class="position-relative">
-                        <button class="crm-icon-btn" type="button" title="Notificações" data-crm-flyout="notifications" aria-expanded="false">
+                        <button class="crm-icon-btn" type="button" title="Notificacoes" data-crm-flyout="notifications" aria-expanded="false">
                             <i class="bi bi-bell"></i>
                         </button>
                         <div class="crm-flyout" data-flyout="notifications">
-                            <h6>Notificações</h6>
+                            <h6>Notificacoes</h6>
                             <div class="crm-flyout-item">
                                 <i class="bi bi-check2-circle mt-1"></i>
                                 <div>
-                                    <strong>Nenhuma pendência</strong>
-                                    <small>Seu painel está atualizado.</small>
+                                    <strong>Nenhuma pendencia</strong>
+                                    <small>Seu painel esta atualizado.</small>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="position-relative">
-                        <button class="crm-icon-btn" type="button" title="Configurações" data-crm-flyout="settings" aria-expanded="false">
+                        <button class="crm-icon-btn" type="button" title="Configuracoes" data-crm-flyout="settings" aria-expanded="false">
                             <i class="bi bi-gear"></i>
                         </button>
                         <div class="crm-flyout" data-flyout="settings">
-                            <h6>Configurações</h6>
+                            <h6>Configuracoes</h6>
                             <a class="crm-flyout-item" href="<?= BASE_URL ?>perfil">
                                 <i class="bi bi-person-badge mt-1"></i>
                                 <div>
@@ -111,7 +111,7 @@ $navItems = [
                             <a class="crm-flyout-item" href="<?= BASE_URL ?>salario">
                                 <i class="bi bi-cash-stack mt-1"></i>
                                 <div>
-                                    <strong>Salário</strong>
+                                    <strong>Salario</strong>
                                     <small>Ajustar renda mensal.</small>
                                 </div>
                             </a>
@@ -126,7 +126,7 @@ $navItems = [
                                 <i class="bi bi-box-arrow-left mt-1"></i>
                                 <div>
                                     <strong>Sair</strong>
-                                    <small>Encerrar a sessão.</small>
+                                    <small>Encerrar a sessao.</small>
                                 </div>
                             </a>
                         </div>
@@ -141,3 +141,5 @@ $navItems = [
                 </div>
             </header>
             <div class="crm-page">
+
+

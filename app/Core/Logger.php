@@ -1,22 +1,13 @@
 <?php
 
 namespace App\Core;
-
-/**
- * Classe de Logger
- * Registra eventos, erros e informações em arquivos de log
- */
 class Logger
 {
     private static $diretorio_logs = '';
     private static $arquivo_info = 'app.log';
     private static $arquivo_erros = 'errors.log';
     private static $arquivo_seguranca = 'security.log';
-
-    /**
-     * Inicializa o diretório de logs
-     */
-    public static function inicializar($diretorio = 'logs')
+public static function inicializar($diretorio = 'logs')
     {
         self::$diretorio_logs = $diretorio;
         
@@ -24,43 +15,23 @@ class Logger
             mkdir(self::$diretorio_logs, 0755, true);
         }
     }
-
-    /**
-     * Registra informação geral
-     */
-    public static function info($mensagem, $contexto = [])
+public static function info($mensagem, $contexto = [])
     {
         self::escreverLog(self::$arquivo_info, 'INFO', $mensagem, $contexto);
     }
-
-    /**
-     * Registra erro
-     */
-    public static function erro($mensagem, $contexto = [])
+public static function erro($mensagem, $contexto = [])
     {
         self::escreverLog(self::$arquivo_erros, 'ERROR', $mensagem, $contexto);
     }
-
-    /**
-     * Registra aviso
-     */
-    public static function aviso($mensagem, $contexto = [])
+public static function aviso($mensagem, $contexto = [])
     {
         self::escreverLog(self::$arquivo_info, 'WARNING', $mensagem, $contexto);
     }
-
-    /**
-     * Registra evento de segurança (login, logout, alterações, etc)
-     */
-    public static function seguranca($mensagem, $contexto = [])
+public static function seguranca($mensagem, $contexto = [])
     {
         self::escreverLog(self::$arquivo_seguranca, 'SECURITY', $mensagem, $contexto);
     }
-
-    /**
-     * Registra exceção
-     */
-    public static function excecao(\Exception $e)
+public static function excecao(\Exception $e)
     {
         $contexto = [
             'file' => $e->getFile(),
@@ -69,11 +40,7 @@ class Logger
         ];
         self::escreverLog(self::$arquivo_erros, 'EXCEPTION', $e->getMessage(), $contexto);
     }
-
-    /**
-     * Escreve no arquivo de log
-     */
-    private static function escreverLog($arquivo, $nivel, $mensagem, $contexto = [])
+private static function escreverLog($arquivo, $nivel, $mensagem, $contexto = [])
     {
         if (empty(self::$diretorio_logs)) {
             self::inicializar();
@@ -81,11 +48,11 @@ class Logger
 
         $caminho_arquivo = self::$diretorio_logs . '/' . date('Y-m-d') . '_' . $arquivo;
         $timestamp = date('Y-m-d H:i:s');
-        $id_usuario = $_SESSION['id_usuario'] ?? 'anônimo';
+        $id_usuario = $_SESSION['id_usuario'] ?? 'anÃ´nimo';
         $ip = self::obterIPUsuario();
         
         $contexto_json = !empty($contexto) ? json_encode($contexto) : '';
-        $linha_log = "[{$timestamp}] [{$nivel}] [Usuário: {$id_usuario}] [IP: {$ip}] {$mensagem}";
+        $linha_log = "[{$timestamp}] [{$nivel}] [UsuÃ¡rio: {$id_usuario}] [IP: {$ip}] {$mensagem}";
         
         if (!empty($contexto_json)) {
             $linha_log .= " | Contexto: {$contexto_json}";
@@ -95,11 +62,7 @@ class Logger
         
         file_put_contents($caminho_arquivo, $linha_log, FILE_APPEND);
     }
-
-    /**
-     * Obtém o IP do usuário
-     */
-    private static function obterIPUsuario()
+private static function obterIPUsuario()
     {
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
             $ip = $_SERVER['HTTP_CLIENT_IP'];
@@ -110,11 +73,7 @@ class Logger
         }
         return $ip;
     }
-
-    /**
-     * Lista logs disponíveis (para debug)
-     */
-    public static function listarLogs()
+public static function listarLogs()
     {
         if (!is_dir(self::$diretorio_logs)) {
             return [];
@@ -123,11 +82,7 @@ class Logger
         $arquivos = scandir(self::$diretorio_logs);
         return array_filter($arquivos, fn($f) => $f !== '.' && $f !== '..');
     }
-
-    /**
-     * Lê conteúdo de um arquivo de log
-     */
-    public static function lerLog($arquivo, $linhas = 100)
+public static function lerLog($arquivo, $linhas = 100)
     {
         $caminho = self::$diretorio_logs . '/' . $arquivo;
         
@@ -140,11 +95,7 @@ class Logger
         
         return array_filter($linhas_array);
     }
-
-    /**
-     * Limpa logs antigos (mais de $dias)
-     */
-    public static function limparLogsAntigos($dias = 30)
+public static function limparLogsAntigos($dias = 30)
     {
         if (!is_dir(self::$diretorio_logs)) {
             return;
@@ -165,6 +116,5 @@ class Logger
         }
     }
 }
-
-// Inicializar logger
 Logger::inicializar();
+

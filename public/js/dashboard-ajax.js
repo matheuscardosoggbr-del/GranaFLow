@@ -1,7 +1,3 @@
-/**
- * GranaFlow — Dashboard AJAX Handler com Atualização em Tempo Real
- * v2.0 — Corrigido e com suporte a edição inline via modais
- */
 
 class DashboardAjax {
     constructor() {
@@ -10,7 +6,6 @@ class DashboardAjax {
     }
 
     initEventListeners() {
-        // Formulários AJAX
         document.addEventListener('submit', (e) => {
             const form = e.target;
             if (form.classList.contains('form-ajax')) {
@@ -18,8 +13,6 @@ class DashboardAjax {
                 this.submitForm(form);
             }
         });
-
-        // Botões de deletar
         document.addEventListener('click', (e) => {
             const btn = e.target.closest('.btn-delete-ajax');
             if (btn) {
@@ -27,8 +20,6 @@ class DashboardAjax {
                 this.deleteItem(btn);
             }
         });
-
-        // Botões de editar — abre modal correto conforme data-type
         document.addEventListener('click', (e) => {
             const btn = e.target.closest('.btn-edit-ajax');
             if (btn) {
@@ -46,13 +37,10 @@ class DashboardAjax {
         }
 
         const text = await response.text();
-        throw new Error((text || 'Resposta inválida do servidor').trim().slice(0, 300));
+        throw new Error((text || 'Resposta invalida do servidor').trim().slice(0, 300));
     }
 
-    /**
-     * Envia formulário via AJAX e atualiza dados em tempo real
-     */
-    async submitForm(form) {
+        async submitForm(form) {
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn ? submitBtn.innerHTML : '';
 
@@ -65,8 +53,6 @@ class DashboardAjax {
             const formData = new FormData(form);
             const action = form.getAttribute('action');
             formData.append('_ajax', '1');
-
-            // Adicionar CSRF token se disponível
             const csrfToken = document.querySelector('meta[name="csrf-token"]');
             if (csrfToken && !formData.has('csrf_token')) {
                 formData.append('csrf_token', csrfToken.content);
@@ -83,22 +69,18 @@ class DashboardAjax {
             const data = await this.parseJsonResponse(response);
 
             if (data.success) {
-                this.showToast(data.message || 'Operação realizada com sucesso!', 'success');
+                this.showToast(data.message || 'Operacao realizada com sucesso!', 'success');
                 form.reset();
-
-                // Fechar modal se o form está dentro de um
                 const modal = form.closest('.modal');
                 if (modal) {
                     bootstrap.Modal.getInstance(modal)?.hide();
                 }
-
-                // Atualizar interface com os dados retornados
                 if (data.data) {
                     this.updateCards(data.data);
                     this.updateTables(data.data);
                 }
             } else {
-                this.showToast(data.message || 'Erro ao processar a requisição', 'error');
+                this.showToast(data.message || 'Erro ao processar a requisicao', 'error');
             }
         } catch (error) {
             console.error('Erro:', error);
@@ -111,10 +93,7 @@ class DashboardAjax {
         }
     }
 
-    /**
-     * Atualiza os cards de resumo
-     */
-    updateCards(data) {
+        updateCards(data) {
         const mappings = {
             'saldo':      { value: data.saldo,          colored: true },
             'total-mes':  { value: data.total_mes,       colored: false },
@@ -132,18 +111,13 @@ class DashboardAjax {
                 }
             }
         });
-
-        // Total guardado no painel de guardar dinheiro
         const totalGuardado = document.querySelector('[data-type="guardado"] .valor');
         if (totalGuardado && data.total_guardado !== undefined) {
             totalGuardado.textContent = 'R$ ' + this.formatarMoeda(data.total_guardado);
         }
     }
 
-    /**
-     * Atualiza todas as tabelas/listas
-     */
-    updateTables(data) {
+        updateTables(data) {
         if (data.gastos !== undefined)              this.updateGastosTable(data.gastos);
         if (data.recorrentes !== undefined)         this.updateRecorrentesTable(data.recorrentes);
         if (data.metas !== undefined)               this.updateMetasTable(data.metas);
@@ -151,11 +125,7 @@ class DashboardAjax {
         if (data.metas !== undefined)               this.updateMetasSelect(data.metas);
     }
 
-    /**
-     * Atualiza tabela de gastos recentes
-     */
-    updateGastosTable(gastos) {
-        // Seleciona apenas a primeira tabela tabela-gastos (não a de recorrentes)
+        updateGastosTable(gastos) {
         const tabela = document.querySelector('table.tabela-gastos:not(.tabela-recorrentes)');
         const tbody = tabela ? tabela.querySelector('tbody') : null;
         if (!tbody) return;
@@ -172,7 +142,7 @@ class DashboardAjax {
             tr.innerHTML = `
                 <td><span style="color:var(--muted);font-size:12px;"><i class="bi bi-calendar3 me-1"></i>${this.formatarData(g.data_gasto)}</span></td>
                 <td><span class="badge badge-categoria">${this.esc(g.categoria)}</span></td>
-                <td style="color:var(--text2);">${this.esc(g.descricao || '—')}</td>
+                <td style="color:var(--text2);">${this.esc(g.descricao || '-')}</td>
                 <td><span class="valor-gasto">${this.esc(g.simbolo || 'R$')} ${this.formatarMoeda(g.valor)}</span></td>
                 <td>
                     <div class="btn-group btn-group-sm" role="group">
@@ -194,10 +164,7 @@ class DashboardAjax {
         });
     }
 
-    /**
-     * Atualiza tabela de gastos recorrentes
-     */
-    updateRecorrentesTable(recorrentes) {
+        updateRecorrentesTable(recorrentes) {
         const tbody = document.querySelector('table.tabela-recorrentes tbody');
         if (!tbody) return;
 
@@ -210,7 +177,7 @@ class DashboardAjax {
 
         recorrentes.forEach(r => {
             const tipoBadge = r.tipo === 'parcelado'
-                ? `<span class="badge" style="background:rgba(248,113,113,0.15);color:var(--red);font-size:11px;">Parcelado · ${r.quantidade_meses}x</span>`
+                ? `<span class="badge" style="background:rgba(248,113,113,0.15);color:var(--red);font-size:11px;">Parcelado Â· ${r.quantidade_meses}x</span>`
                 : `<span class="badge" style="background:rgba(251,191,36,0.15);color:var(--yellow);font-size:11px;">Mensal</span>`;
 
             const tr = document.createElement('tr');
@@ -220,7 +187,7 @@ class DashboardAjax {
                 <td style="color:var(--text2);">${this.esc(r.descricao)}</td>
                 <td>${tipoBadge}</td>
                 <td><span class="valor-gasto">R$ ${this.formatarMoeda(r.valor)}</span></td>
-                <td><span style="color:var(--muted);font-size:12px;">${r.ultima_execucao ? this.formatarData(r.ultima_execucao) : '—'}</span></td>
+                <td><span style="color:var(--muted);font-size:12px;">${r.ultima_execucao ? this.formatarData(r.ultima_execucao) : '-'}</span></td>
                 <td>
                     <div class="btn-group btn-group-sm" role="group">
                         <button class="btn btn-outline-primary btn-edit-ajax"
@@ -239,10 +206,7 @@ class DashboardAjax {
         });
     }
 
-    /**
-     * Atualiza lista de metas
-     */
-    updateMetasTable(metas) {
+        updateMetasTable(metas) {
         const container = document.getElementById('metas-list');
         if (!container) return;
 
@@ -297,17 +261,14 @@ class DashboardAjax {
                 </div>
                 <small style="color:${done ? 'var(--green)' : 'var(--muted)'};font-size:11px;font-weight:500;">
                     ${done
-                        ? '<i class="bi bi-star-fill me-1"></i> Meta concluída!'
-                        : `${pct.toFixed(1)}% concluído · faltam R$ ${this.formatarMoeda(m.valor_limite - m.valor_guardado)}`}
+                        ? '<i class="bi bi-star-fill me-1"></i> Meta concluida!'
+                        : `${pct.toFixed(1)}% concluido - faltam R$ ${this.formatarMoeda(m.valor_limite - m.valor_guardado)}`}
                 </small>`;
             container.appendChild(div);
         });
     }
 
-    /**
-     * Atualiza histórico de dinheiro guardado
-     */
-    updateHistoricoGuardado(historico) {
+        updateHistoricoGuardado(historico) {
         const tbody = document.querySelector('table.tabela-historico-guardado tbody');
         if (!tbody) return;
 
@@ -324,10 +285,7 @@ class DashboardAjax {
         });
     }
 
-    /**
-     * Atualiza select de metas no formulário "Guardar Dinheiro"
-     */
-    updateMetasSelect(metas) {
+        updateMetasSelect(metas) {
         const selects = document.querySelectorAll('select[name="id_meta"]');
         selects.forEach(select => {
             const currentValue = select.value;
@@ -346,10 +304,7 @@ class DashboardAjax {
         });
     }
 
-    /**
-     * Abre o modal de edição adequado conforme o tipo do item
-     */
-    openEditModal(btn) {
+        openEditModal(btn) {
         const type = btn.getAttribute('data-type');
 
         if (type === 'gasto') {
@@ -362,7 +317,6 @@ class DashboardAjax {
             document.getElementById('editGastoData').value      = btn.getAttribute('data-data') || '';
             const catSelect = document.getElementById('editGastoCategoria');
             if (catSelect) catSelect.value = btn.getAttribute('data-categoria') || '';
-            // Aponta o form para a rota de salvar gasto (com id_gasto oculto)
             document.getElementById('formEditarGasto').setAttribute('action', this.baseUrl + 'gastos/adicionar');
             new bootstrap.Modal(modal).show();
 
@@ -388,10 +342,7 @@ class DashboardAjax {
         }
     }
 
-    /**
-     * Deleta um item via AJAX
-     */
-    async deleteItem(btn) {
+        async deleteItem(btn) {
         if (!confirm('Tem certeza que deseja deletar este item?')) return;
 
         const url  = btn.getAttribute('data-url');
@@ -416,16 +367,12 @@ class DashboardAjax {
 
             if (data.success) {
                 this.showToast(data.message || 'Item deletado com sucesso!', 'success');
-
-                // Remover linha/item com animação
                 const row = btn.closest('tr') || btn.closest('.meta-item');
                 if (row) {
                     row.style.transition = 'opacity 0.3s';
                     row.style.opacity = '0';
                     setTimeout(() => row.remove(), 300);
                 }
-
-                // Atualizar dados
                 if (data.data) {
                     setTimeout(() => {
                         this.updateCards(data.data);
@@ -475,7 +422,7 @@ class DashboardAjax {
     }
 
     formatarData(data) {
-        if (!data) return '—';
+        if (!data) return '-';
         const d = new Date(data + 'T00:00:00');
         return d.toLocaleDateString('pt-BR');
     }
@@ -490,3 +437,5 @@ class DashboardAjax {
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboardAjax = new DashboardAjax();
 });
+
+

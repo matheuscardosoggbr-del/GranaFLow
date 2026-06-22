@@ -84,3 +84,4 @@ class Receita extends Model
         return $stmt->execute();
     }
 }
+

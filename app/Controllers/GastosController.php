@@ -12,17 +12,11 @@ class GastosController extends Controller
             redirecionar('auth/login');
         }
     }
-
-    /**
-     * Lista todos os gastos do usuário
-     */
-    public function index()
+public function index()
     {
         $id_usuario = $_SESSION['id_usuario'];
         $gastoModel = $this->model('Gasto');
         $categoriaModel = $this->model('Categoria');
-
-        // Filtros
         $filtro_categoria = $_GET['categoria'] ?? null;
         $filtro_mes = $_GET['mes'] ?? date('Y-m');
         $ordem = $_GET['ordem'] ?? 'data_desc';
@@ -43,11 +37,7 @@ class GastosController extends Controller
 
         $this->view('gastos/index', $data);
     }
-
-    /**
-     * Exibe formulário de novo gasto
-     */
-    public function novo()
+public function novo()
     {
         $id_usuario = $_SESSION['id_usuario'];
         $categoriaModel = $this->model('Categoria');
@@ -60,11 +50,7 @@ class GastosController extends Controller
 
         $this->view('gastos/form', $data);
     }
-
-    /**
-     * Exibe formulário de edição
-     */
-    public function editar($id)
+public function editar($id)
     {
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id);
@@ -87,25 +73,17 @@ class GastosController extends Controller
 
         $this->view('gastos/form', $data);
     }
-
-    /**
-     * Salva novo gasto ou edita existente
-     */
-    public function salvar()
+public function salvar()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirecionar('gastos');
         }
 
         $id_usuario = $_SESSION['id_usuario'];
-
-        // Validar CSRF
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-            $_SESSION['erro'] = "Solicitação inválida.";
+            $_SESSION['erro'] = "SolicitaÃ§Ã£o invÃ¡lida.";
             redirecionar('gastos');
         }
-
-        // Validar entrada
         $id_gasto = intval($_POST['id_gasto'] ?? 0);
         $id_categoria = intval($_POST['id_categoria'] ?? 0);
         $descricao = $this->sanitizar($_POST['descricao'] ?? '');
@@ -113,12 +91,12 @@ class GastosController extends Controller
         $data_gasto = $this->sanitizar($_POST['data_gasto'] ?? '');
 
         if ($id_categoria <= 0) {
-            $_SESSION['erro'] = "Categoria inválida.";
+            $_SESSION['erro'] = "Categoria invÃ¡lida.";
             redirecionar('gastos/novo');
         }
 
         if (empty($descricao) || strlen($descricao) > 255) {
-            $_SESSION['erro'] = "Descrição inválida.";
+            $_SESSION['erro'] = "DescriÃ§Ã£o invÃ¡lida.";
             redirecionar('gastos/novo');
         }
 
@@ -128,14 +106,13 @@ class GastosController extends Controller
         }
 
         if (!$this->validarData($data_gasto)) {
-            $_SESSION['erro'] = "Data inválida.";
+            $_SESSION['erro'] = "Data invÃ¡lida.";
             redirecionar('gastos/novo');
         }
 
         $gastoModel = $this->model('Gasto');
 
         if ($id_gasto > 0) {
-            // Editar
             if (!$gastoModel->pertenceAoUsuario('gastos', 'id_gasto', $id_gasto, $id_usuario)) {
                 $_SESSION['erro'] = "Acesso negado.";
                 redirecionar('gastos');
@@ -143,7 +120,6 @@ class GastosController extends Controller
             $sucesso = $gastoModel->atualizar($id_gasto, $id_categoria, $descricao, $valor, $data_gasto);
             $mensagem = "Gasto atualizado com sucesso!";
         } else {
-            // Novo
             $sucesso = $gastoModel->adicionar($id_usuario, $id_categoria, $descricao, $valor, $data_gasto);
             $mensagem = "Gasto adicionado com sucesso!";
         }
@@ -156,21 +132,13 @@ class GastosController extends Controller
 
         redirecionar('gastos');
     }
-
-    /**
-     * Verifica se é requisição AJAX
-     */
-    private function isAjax()
+private function isAjax()
     {
         return isset($_POST['_ajax']) || isset($_GET['_ajax']) || 
                (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                 strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
     }
-
-    /**
-     * Retorna resposta JSON
-     */
-    private function jsonResponse($success, $message = '', $data = [])
+private function jsonResponse($success, $message = '', $data = [])
     {
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
@@ -180,37 +148,31 @@ class GastosController extends Controller
         ]);
         exit;
     }
-
-    /**
-     * Adiciona gasto (com suporte AJAX)
-     */
-    public function adicionar()
+public function adicionar()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirecionar('gastos');
         }
 
         $id_usuario = $_SESSION['id_usuario'];
-        $id_gasto_edit = intval($_POST['id_gasto'] ?? 0); // para edição via modal
+        $id_gasto_edit = intval($_POST['id_gasto'] ?? 0);
         $id_categoria = intval($_POST['id_categoria'] ?? 0);
         $descricao = $this->sanitizar($_POST['descricao'] ?? '');
         $valor = floatval(str_replace(',', '.', $_POST['valor'] ?? 0));
         $data_gasto = $this->sanitizar($_POST['data_gasto'] ?? date('Y-m-d'));
-
-        // Validações
         if ($id_categoria <= 0) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'Categoria inválida.');
+                $this->jsonResponse(false, 'Categoria invÃ¡lida.');
             }
-            $_SESSION['erro'] = "Categoria inválida.";
+            $_SESSION['erro'] = "Categoria invÃ¡lida.";
             redirecionar('gastos');
         }
 
         if (empty($descricao) || strlen($descricao) > 255) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'Descrição inválida (máx 255 caracteres).');
+                $this->jsonResponse(false, 'DescriÃ§Ã£o invÃ¡lida (mÃ¡x 255 caracteres).');
             }
-            $_SESSION['erro'] = "Descrição inválida.";
+            $_SESSION['erro'] = "DescriÃ§Ã£o invÃ¡lida.";
             redirecionar('gastos/novo');
         }
 
@@ -224,15 +186,13 @@ class GastosController extends Controller
 
         if (!$this->validarData($data_gasto)) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'Data inválida.');
+                $this->jsonResponse(false, 'Data invÃ¡lida.');
             }
-            $_SESSION['erro'] = "Data inválida.";
+            $_SESSION['erro'] = "Data invÃ¡lida.";
             redirecionar('gastos/novo');
         }
 
         $gastoModel = $this->model('Gasto');
-
-        // Se id_gasto_edit > 0, é edição (via modal no dashboard)
         if ($id_gasto_edit > 0) {
             if (!$gastoModel->pertenceAoUsuario('gastos', 'id_gasto', $id_gasto_edit, $id_usuario)) {
                 if ($this->isAjax()) { $this->jsonResponse(false, 'Acesso negado.'); }
@@ -240,7 +200,6 @@ class GastosController extends Controller
             }
             $sucesso = $gastoModel->atualizar($id_gasto_edit, $id_categoria, $descricao, $valor, $data_gasto);
             if ($this->isAjax()) {
-                // Retornar dados atualizados do dashboard
                 $metaModel     = $this->model('Meta');
                 $salarioModel  = $this->model('Salario');
                 $poupancaModel = $this->model('Poupanca');
@@ -295,28 +254,24 @@ class GastosController extends Controller
 
         redirecionar('gastos');
     }
-
-    /**
-     * Deleta um gasto
-     */
-    public function deletar($id = null)
+public function deletar($id = null)
     {
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id ?? ($_GET['id'] ?? 0));
 
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'Solicitação inválida.');
+                $this->jsonResponse(false, 'SolicitaÃ§Ã£o invÃ¡lida.');
             }
-            $_SESSION['erro'] = "Solicitação inválida.";
+            $_SESSION['erro'] = "SolicitaÃ§Ã£o invÃ¡lida.";
             redirecionar('gastos');
         }
 
         if ($id <= 0) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'ID inválido.');
+                $this->jsonResponse(false, 'ID invÃ¡lido.');
             }
-            $_SESSION['erro'] = "ID inválido.";
+            $_SESSION['erro'] = "ID invÃ¡lido.";
             redirecionar('gastos');
         }
 
@@ -345,3 +300,4 @@ class GastosController extends Controller
         redirecionar('gastos');
     }
 }
+

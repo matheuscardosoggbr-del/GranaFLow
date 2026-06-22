@@ -121,11 +121,7 @@ class DashboardController extends Controller
 
         $this->view('dashboard/index', $data);
     }
-
-    /**
-     * Endpoint AJAX: retorna dados atualizados do dashboard em JSON
-     */
-    public function getDashboardData()
+public function getDashboardData()
     {
         if (!$this->isAjax()) {
             http_response_code(400);
@@ -139,11 +135,7 @@ class DashboardController extends Controller
             $this->jsonResponse(false, 'Erro ao carregar dados: ' . $e->getMessage());
         }
     }
-
-    /**
-     * Calcula todos os dados do dashboard (método interno, sem conflito de nome)
-     */
-    private function calcularDadosDashboard()
+private function calcularDadosDashboard()
     {
         $id_usuario     = $_SESSION['id_usuario'];
         $gastoModel     = $this->model('Gasto');
@@ -228,7 +220,7 @@ class DashboardController extends Controller
             try {
                 if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
                     if ($this->isAjax()) {
-                        $this->jsonResponse(false, 'Solicitação inválida.');
+                        $this->jsonResponse(false, 'SolicitaÃ§Ã£o invÃ¡lida.');
                     }
                     redirecionar('dashboard');
                 }
@@ -238,11 +230,11 @@ class DashboardController extends Controller
 
                 if ($this->isAjax()) {
                     $data = $this->calcularDadosDashboard();
-                    $this->jsonResponse(true, 'Salário atualizado com sucesso!', $data, 'salario');
+                    $this->jsonResponse(true, 'SalÃ¡rio atualizado com sucesso!', $data, 'salario');
                 }
             } catch (\Exception $e) {
                 if ($this->isAjax()) {
-                    $this->jsonResponse(false, 'Erro ao salvar salário: ' . $e->getMessage());
+                    $this->jsonResponse(false, 'Erro ao salvar salÃ¡rio: ' . $e->getMessage());
                 }
             }
         }
@@ -255,7 +247,7 @@ class DashboardController extends Controller
             try {
                 if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
                     if ($this->isAjax()) {
-                        $this->jsonResponse(false, 'Solicitação inválida.');
+                        $this->jsonResponse(false, 'SolicitaÃ§Ã£o invÃ¡lida.');
                     }
                     redirecionar('dashboard');
                 }
@@ -267,7 +259,7 @@ class DashboardController extends Controller
                     $quantidade = intval($_POST['quantidade'] ?? 0);
                     if ($quantidade < 1) {
                         if ($this->isAjax()) {
-                            $this->jsonResponse(false, 'Quantidade de meses inválida.');
+                            $this->jsonResponse(false, 'Quantidade de meses invÃ¡lida.');
                         }
                         redirecionar('dashboard');
                     }
@@ -296,18 +288,13 @@ class DashboardController extends Controller
         }
         redirecionar('dashboard');
     }
-
-    /**
-     * Guarda dinheiro diretamente em uma meta (botão + dentro das metas)
-     * Subtrai do saldo registrando em dinheiro_guardado
-     */
-    public function guardarDinheiro()
+public function guardarDinheiro()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             try {
                 if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
                     if ($this->isAjax()) {
-                        $this->jsonResponse(false, 'Solicitação inválida.');
+                        $this->jsonResponse(false, 'SolicitaÃ§Ã£o invÃ¡lida.');
                     }
                     redirecionar('dashboard');
                 }
@@ -329,15 +316,11 @@ class DashboardController extends Controller
                 $meta = $metaModel->getMetaById($id_meta, $id_usuario);
                 if (!$meta) {
                     if ($this->isAjax()) {
-                        $this->jsonResponse(false, 'Meta não encontrada.');
+                        $this->jsonResponse(false, 'Meta nÃ£o encontrada.');
                     }
                     redirecionar('dashboard');
                 }
-
-                // Guardar na meta (atualiza valor_guardado)
                 $metaModel->guardarDinheiro($id_meta, $id_usuario, $valor);
-
-                // Registrar no historico (subtrai do saldo)
                 $poupancaModel->guardar($id_usuario, $valor, 'Guardado para: ' . $meta['nome_meta']);
 
                 if ($this->isAjax()) {
@@ -352,18 +335,13 @@ class DashboardController extends Controller
         }
         redirecionar('dashboard');
     }
-
-    /**
-     * Guarda dinheiro avulso (formulário "Guardar Dinheiro")
-     * Pode opcionalmente associar a uma meta
-     */
-    public function guardarAvulso()
+public function guardarAvulso()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['valor']) && $_POST['valor'] > 0) {
             try {
                 if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
                     if ($this->isAjax()) {
-                        $this->jsonResponse(false, 'Solicitação inválida.');
+                        $this->jsonResponse(false, 'SolicitaÃ§Ã£o invÃ¡lida.');
                     }
                     redirecionar('dashboard');
                 }
@@ -375,8 +353,6 @@ class DashboardController extends Controller
 
                 $poupancaModel = $this->model('Poupanca');
                 $metaModel     = $this->model('Meta');
-
-                // Se escolheu uma meta, guardar nela também
                 if ($id_meta > 0) {
                     $meta = $metaModel->getMetaById($id_meta, $id_usuario);
                     if ($meta) {
@@ -384,8 +360,6 @@ class DashboardController extends Controller
                         $descricao = 'Guardado para: ' . $meta['nome_meta'];
                     }
                 }
-
-                // Sempre registrar no historico para subtrair do saldo
                 $poupancaModel->guardar($id_usuario, $valor, $descricao);
 
                 if ($this->isAjax()) {
@@ -400,25 +374,21 @@ class DashboardController extends Controller
         }
         redirecionar('dashboard');
     }
-
-    /**
-     * Deleta um gasto recorrente
-     */
-    public function deletarRecorrente($id = null)
+public function deletarRecorrente($id = null)
     {
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id ?? ($_GET['id'] ?? 0));
 
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'Solicitação inválida.');
+                $this->jsonResponse(false, 'SolicitaÃ§Ã£o invÃ¡lida.');
             }
             redirecionar('dashboard');
         }
 
         if ($id <= 0) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'ID inválido.');
+                $this->jsonResponse(false, 'ID invÃ¡lido.');
             }
             redirecionar('dashboard');
         }
@@ -437,11 +407,7 @@ class DashboardController extends Controller
         }
         redirecionar('dashboard');
     }
-
-    /**
-     * Edita um gasto recorrente
-     */
-    public function editarRecorrente($id = null)
+public function editarRecorrente($id = null)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirecionar('dashboard');
@@ -452,14 +418,14 @@ class DashboardController extends Controller
 
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'Solicitação inválida.');
+                $this->jsonResponse(false, 'SolicitaÃ§Ã£o invÃ¡lida.');
             }
             redirecionar('dashboard');
         }
 
         if ($id <= 0) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'ID inválido.');
+                $this->jsonResponse(false, 'ID invÃ¡lido.');
             }
             redirecionar('dashboard');
         }
@@ -470,7 +436,7 @@ class DashboardController extends Controller
 
         if (empty($descricao) || $valor <= 0 || $dia < 1 || $dia > 31) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'Dados inválidos.');
+                $this->jsonResponse(false, 'Dados invÃ¡lidos.');
             }
             redirecionar('dashboard');
         }
@@ -490,3 +456,4 @@ class DashboardController extends Controller
         redirecionar('dashboard');
     }
 }
+

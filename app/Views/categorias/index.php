@@ -47,7 +47,7 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 
 <?php if (empty($categorias)): ?>
     <div class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>Você não tem categorias personalizadas. Use as categorias padrão.
+        <i class="bi bi-info-circle me-2"></i>VocÃª nÃ£o tem categorias personalizadas. Use as categorias padrÃ£o.
     </div>
 <?php else: ?>
     <div class="card formulario-card">
@@ -58,7 +58,7 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
                         <tr>
                             <th>Nome</th>
                             <th>Tipo</th>
-                            <th class="text-center">Ações</th>
+                            <th class="text-center">AÃ§Ãµes</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -91,3 +91,4 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 <?php endif; ?>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+

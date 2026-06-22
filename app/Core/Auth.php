@@ -1,18 +1,9 @@
 <?php
 
 namespace App\Core;
-
-/**
- * Classe de Autenticação e Autorização
- * Gerencia verificação de sessão e acesso a recursos
- */
 class Auth
 {
-    /**
-     * Verifica se o usuário está autenticado
-     * Se não, redireciona para login
-     */
-    public static function verificarAutenticacao()
+public static function verificarAutenticacao()
     {
         if (!self::isLogado()) {
             session_destroy();
@@ -20,13 +11,7 @@ class Auth
             exit;
         }
     }
-
-    /**
-     * Verifica se o usuário tem permissões específicas
-     * 
-     * @param array $permissoes Array com permissões necessárias
-     */
-    public static function verificarAcesso($permissoes = [])
+public static function verificarAcesso($permissoes = [])
     {
         self::verificarAutenticacao();
         
@@ -42,33 +27,21 @@ class Auth
             }
             
             if (!$temAcesso) {
-                $_SESSION['erro'] = 'Acesso negado. Você não tem permissão para acessar este recurso.';
+                $_SESSION['erro'] = 'Acesso negado. VocÃª nÃ£o tem permissÃ£o para acessar este recurso.';
                 redirecionar('dashboard');
                 exit;
             }
         }
     }
-
-    /**
-     * Verifica se o usuário está logado
-     */
-    public static function isLogado()
+public static function isLogado()
     {
         return isset($_SESSION['id_usuario']) && !empty($_SESSION['id_usuario']);
     }
-
-    /**
-     * Obtém o ID do usuário logado
-     */
-    public static function getIdUsuario()
+public static function getIdUsuario()
     {
         return $_SESSION['id_usuario'] ?? null;
     }
-
-    /**
-     * Obtém dados do usuário logado
-     */
-    public static function getUsuario()
+public static function getUsuario()
     {
         return [
             'id_usuario' => $_SESSION['id_usuario'] ?? null,
@@ -77,22 +50,14 @@ class Auth
             'permissoes' => $_SESSION['permissoes'] ?? []
         ];
     }
-
-    /**
-     * Faz logout do usuário
-     */
-    public static function logout()
+public static function logout()
     {
-        Logger::info('Usuário realizado logout', ['id_usuario' => $_SESSION['id_usuario'] ?? null]);
+        Logger::info('UsuÃ¡rio realizado logout', ['id_usuario' => $_SESSION['id_usuario'] ?? null]);
         session_destroy();
         redirecionar('auth/login');
         exit;
     }
-
-    /**
-     * Realiza login (deve ser chamado pelo AuthController)
-     */
-    public static function login($id_usuario, $nome, $email, $permissoes = [])
+public static function login($id_usuario, $nome, $email, $permissoes = [])
     {
         $_SESSION['id_usuario'] = $id_usuario;
         $_SESSION['nome'] = $nome;
@@ -100,14 +65,11 @@ class Auth
         $_SESSION['permissoes'] = $permissoes;
         $_SESSION['login_time'] = time();
         
-        Logger::info('Usuário realizado login com sucesso', ['id_usuario' => $id_usuario, 'email' => $email]);
+        Logger::info('UsuÃ¡rio realizado login com sucesso', ['id_usuario' => $id_usuario, 'email' => $email]);
     }
-
-    /**
-     * Regenera o ID da sessão (para segurança)
-     */
-    public static function regenerarSessao()
+public static function regenerarSessao()
     {
         session_regenerate_id(true);
     }
 }
+

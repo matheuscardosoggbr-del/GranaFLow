@@ -1,7 +1,7 @@
 <?php
-$pageTitle = 'Salário';
+$pageTitle = 'SalÃ¡rio';
 $pageKicker = 'Finance CRM';
-$pageHeading = 'Meu Salário';
+$pageHeading = 'Meu SalÃ¡rio';
 $activePage = 'salario';
 require_once dirname(__DIR__) . '/partials/shell_top.php';
 ?>
@@ -28,20 +28,20 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
             <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
             <div class="alert alert-info mb-4">
                 <div class="text-center">
-                    <small class="page-subtitle">Salário Atual</small>
+                    <small class="page-subtitle">SalÃ¡rio Atual</small>
                     <h3 class="mb-0 text-primary">R$ <?= number_format($salario, 2, ',', '.') ?></h3>
                 </div>
             </div>
             <div class="mb-3">
-                <label for="valor" class="form-label">Novo Salário <span class="text-danger">*</span></label>
+                <label for="valor" class="form-label">Novo SalÃ¡rio <span class="text-danger">*</span></label>
                 <div class="input-group input-group-lg">
                     <span class="input-group-text">R$</span>
                     <input type="number" id="valor" name="valor" class="form-control" step="0.01" min="0.01" value="<?= number_format($salario, 2, '.', '') ?>" placeholder="0,00" required>
                 </div>
-                <small class="page-subtitle">Insira seu salário líquido mensal.</small>
+                <small class="page-subtitle">Insira seu salÃ¡rio lÃ­quido mensal.</small>
             </div>
             <button type="submit" class="btn btn-primary btn-acao btn-lg w-100">
-                <i class="bi bi-save me-2"></i>Atualizar Salário
+                <i class="bi bi-save me-2"></i>Atualizar SalÃ¡rio
             </button>
         </form>
 
@@ -50,15 +50,15 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
         <div class="alert alert-light">
             <h6 class="mb-2"><i class="bi bi-lightbulb me-2"></i>Dicas</h6>
             <ul class="mb-0">
-                <li>Atualize seu salário sempre que houver alterações</li>
-                <li>Use o valor líquido já descontados impostos</li>
-                <li>O saldo no dashboard é calculado como: salário - gastos do mês - dinheiro guardado</li>
+                <li>Atualize seu salÃ¡rio sempre que houver alteraÃ§Ãµes</li>
+                <li>Use o valor lÃ­quido jÃ¡ descontados impostos</li>
+                <li>O saldo no dashboard Ã© calculado como: salÃ¡rio - gastos do mÃªs - dinheiro guardado</li>
             </ul>
         </div>
 
         <?php if (!empty($historico)): ?>
             <hr class="my-4">
-            <h6 class="mb-3"><i class="bi bi-clock-history me-2"></i>Histórico recente</h6>
+            <h6 class="mb-3"><i class="bi bi-clock-history me-2"></i>HistÃ³rico recente</h6>
             <div class="table-responsive">
                 <table class="table table-sm tabela-gastos mb-0">
                     <thead>
@@ -82,3 +82,4 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 </div>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+

@@ -10,28 +10,24 @@ class Model
 
     public function __construct()
     {
-        $host   = "localhost";
-        $usuario = "root";
-        $senha  = "";
-        $banco  = "granaflow";
-        $porta  = 3308;
+        $host = env('DB_HOST', 'localhost');
+        $usuario = env('DB_USER', 'root');
+        $senha = env('DB_PASS', '');
+        $banco = env('DB_NAME', 'granaflow');
+        $porta = (int) env('DB_PORT', 3308);
 
         $this->db = new mysqli($host, $usuario, $senha, $banco, $porta);
 
         if ($this->db->connect_error) {
             throw new \RuntimeException(
                 "Erro ao conectar ao banco de dados: " . $this->db->connect_error .
-                " (Verifique se o MySQL está rodando na porta $porta)"
+                " (Verifique se o MySQL estÃ¡ rodando na porta $porta)"
             );
         }
 
         $this->db->set_charset("utf8mb4");
     }
-
-    /**
-     * Verifica se um recurso pertence ao usuário
-     */
-    public function pertenceAoUsuario($tabela, $id_coluna, $id_recurso, $id_usuario)
+public function pertenceAoUsuario($tabela, $id_coluna, $id_recurso, $id_usuario)
     {
         $sql = "SELECT id_usuario FROM $tabela WHERE $id_coluna = ?";
         $stmt = $this->db->prepare($sql);
@@ -40,12 +36,9 @@ class Model
         $result = $stmt->get_result()->fetch_assoc();
         return $result && $result['id_usuario'] == $id_usuario;
     }
-
-    /**
-     * Obtém a última mensagem de erro
-     */
-    public function getErro()
+public function getErro()
     {
         return $this->db->error;
     }
 }
+

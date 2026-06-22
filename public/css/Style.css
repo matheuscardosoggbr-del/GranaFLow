@@ -1,16 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
 
-/* =======================================================
-   GRANAFLOW — Style.css  v2.0  (Dark + Light)
-   Redesign: Premium finance dashboard aesthetic
-   Fonte: Syne (display) + Roboto (body)
-======================================================= */
 
 
 
-/* -------------------------------------------------------
-   TEMA ESCURO (padrão)
-------------------------------------------------------- */
 :root {
     --nav2:           #0d0f1a;
     --fundo:          #080b14;
@@ -793,7 +785,6 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--card3); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
 
-/* AUTH */
 body.auth-page, body.login-page, body.register-page {
     background:
         radial-gradient(circle at top left, rgba(124,106,247,0.22), transparent 30%),
@@ -1049,7 +1040,6 @@ body.auth-page::after {
 .links a, .text-center a, .auth-foot a { color: var(--accent); text-decoration: none; font-weight: 700; }
 .links a:hover, .text-center a:hover, .auth-foot a:hover { text-decoration: underline; }
 
-/* CARDS RESUMO */
 .card-resumo {
     border: 1px solid var(--shell-border) !important;
     border-radius: 22px !important;
@@ -1102,7 +1092,6 @@ body.auth-page::after {
 .saldo-positivo { color: var(--green) !important; }
 .saldo-negativo { color: var(--red) !important; }
 
-/* FORMULÁRIOS */
 .formulario-card {
     border: 1px solid var(--shell-border) !important;
     border-radius: 22px !important;
@@ -1159,7 +1148,6 @@ body:not(.auth-page) .form-label {
 }
 body:not(.auth-page) .form-select option { background: var(--card2); color: var(--text); }
 
-/* BOTÕES */
 .btn-acao {
     border-radius: 10px !important;
     font-weight: 600 !important;
@@ -1208,7 +1196,6 @@ body:not(.auth-page) .form-select option { background: var(--card2); color: var(
     padding: 5px 12px !important;
 }
 
-/* GRÁFICOS */
 .grafico-container {
     background: var(--shell-surface);
     border: 1px solid var(--shell-border);
@@ -1237,7 +1224,6 @@ body:not(.auth-page) .form-select option { background: var(--card2); color: var(
     margin-bottom: 16px;
 }
 
-/* TABELA */
 .table {
     --bs-table-bg:         transparent !important;
     --bs-table-striped-bg: transparent !important;
@@ -1290,7 +1276,6 @@ body:not(.auth-page) .form-select option { background: var(--card2); color: var(
     border: 1px solid var(--accent-border) !important;
 }
 
-/* METAS */
 .meta-item {
     background: transparent !important;
     border-radius: 0 !important;
@@ -1322,25 +1307,21 @@ body:not(.auth-page) .form-select option { background: var(--card2); color: var(
     transition: width 0.6s ease;
 }
 
-/* ALERTS */
 .alert { border-radius: 10px; font-size: 13px; border: none; padding: 10px 16px; }
 .alert-success { background: var(--green-dim) !important; color: var(--green) !important; border: 1px solid var(--green-border) !important; }
 .alert-danger  { background: var(--red-dim) !important;   color: var(--red) !important;   border: 1px solid var(--red-border) !important; }
 .alert-warning { background: var(--yellow-dim) !important; color: var(--yellow) !important; border: 1px solid var(--yellow-border) !important; }
 
-/* EMPTY STATE */
 .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
 .empty-state i { font-size: 32px; margin-bottom: 12px; opacity: 0.4; display: block; }
 .empty-state p { font-size: 13px; margin: 0; }
 
-/* ANIMAÇÃO */
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 .container.mt-4 { animation: fadeInUp 0.35s ease both; }
 
-/* RESPONSIVO */
 @media (max-width: 768px) {
     .card-resumo .valor { font-size: 1.25rem !important; }
     .grafico-container { margin-bottom: 1rem; }
@@ -1492,7 +1473,6 @@ body:not(.auth-page) .form-select option { background: var(--card2); color: var(
     }
 }
 
-/* ── LARGURA MÁXIMA DO LAYOUT ── */
 .container.mt-4 {
     max-width: 1200px !important;
     margin-left: auto !important;
@@ -1504,3 +1484,4 @@ body:not(.auth-page) .form-select option { background: var(--card2); color: var(
 .shell-page .container.mt-4 {
     max-width: 1200px !important;
 }
+

@@ -1,7 +1,7 @@
 <?php
-$pageTitle = 'Dashboard';
-$pageKicker = 'Finance CRM';
-$pageHeading = 'Overview';
+$pageTitle = 'Painel';
+$pageKicker = 'Gestao Financeira';
+$pageHeading = 'Visao Geral';
 $activePage = 'dashboard';
 
 require_once dirname(__DIR__) . '/partials/shell_top.php';
@@ -43,7 +43,7 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
         <div class="card-resumo-icon" style="background:rgba(248,113,113,0.10);color:var(--red);">
             <i class="bi bi-calendar3"></i>
         </div>
-        <div class="label">Gasto Mês</div>
+        <div class="label">Gasto Mes</div>
         <div class="value valor">R$ <?= number_format((float)$total_mes, 2, ',', '.') ?></div>
     </article>
 
@@ -59,7 +59,7 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
         <div class="card-resumo-icon" style="background:rgba(52,211,153,0.10);color:var(--green);">
             <i class="bi bi-cash-stack"></i>
         </div>
-        <div class="label">Salário</div>
+        <div class="label">Salario</div>
         <div class="value valor saldo-positivo">R$ <?= number_format((float)$salario, 2, ',', '.') ?></div>
     </article>
 
@@ -67,7 +67,7 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
         <div class="card-resumo-icon" style="background:rgba(14,165,233,0.10);color:#0ea5e9;">
             <i class="bi bi-arrow-down-circle"></i>
         </div>
-        <div class="label">Entradas Mês</div>
+        <div class="label">Entradas Mes</div>
         <div class="value valor saldo-positivo">R$ <?= number_format((float)($total_receitas_mes ?? 0), 2, ',', '.') ?></div>
     </article>
 </div>
@@ -97,7 +97,7 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 </div>
 
 <div class="crm-section-title">
-    <h3>Ações Rápidas</h3>
+    <h3>Acoes Rapidas</h3>
     <span class="crm-badge"><i class="bi bi-lightning-charge"></i>Fluxo principal</span>
 </div>
 
@@ -108,13 +108,13 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
                 <div class="card-header-icon" style="background:rgba(52,211,153,0.12);color:var(--green);">
                     <i class="bi bi-currency-dollar"></i>
                 </div>
-                <h6>Atualizar Salário</h6>
+                <h6>Atualizar Salario</h6>
             </div>
             <div class="card-body">
                 <form method="POST" action="<?= BASE_URL ?>dashboard/salvarSalario" class="form-ajax" id="form-salario">
                     <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                     <div class="mb-3">
-                        <label class="form-label">Valor do salário</label>
+                        <label class="form-label">Valor do salario</label>
                         <input type="number" step="0.01" class="form-control" name="salario" value="<?= number_format((float)$salario, 2, '.', '') ?>" required placeholder="0,00">
                     </div>
                     <button type="submit" class="btn btn-success btn-acao w-100">
@@ -692,7 +692,7 @@ window.addEventListener('granaflow:themechange', () => {
 </script>
 <script src="<?= BASE_URL ?>js/dashboard-ajax.js"></script>
 
-<!-- MODAL: EDITAR GASTO -->
+
 <div class="modal fade" id="modalEditarGasto" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content" style="background:var(--card);border:1px solid var(--border);">
@@ -736,7 +736,7 @@ window.addEventListener('granaflow:themechange', () => {
     </div>
 </div>
 
-<!-- MODAL: EDITAR RECORRENTE -->
+
 <div class="modal fade" id="modalEditarRecorrente" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content" style="background:var(--card);border:1px solid var(--border);">
@@ -770,7 +770,7 @@ window.addEventListener('granaflow:themechange', () => {
     </div>
 </div>
 
-<!-- MODAL: EDITAR META -->
+
 <div class="modal fade" id="modalEditarMeta" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content" style="background:var(--card);border:1px solid var(--border);">
@@ -800,3 +800,6 @@ window.addEventListener('granaflow:themechange', () => {
 </div>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+
+
+

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login — GranaFlow</title>
+    <title>Entrar - GranaFlow</title>
     <script src="<?= BASE_URL ?>js/theme.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -19,10 +19,10 @@
             </div>
             <div class="auth-hero-copy">
                 <h1>Controle financeiro com leitura clara e foco no que importa.</h1>
-                <p>Uma experiência de CRM moderna para acompanhar gastos, metas e salário com contraste forte, navegação consistente e temas personalizáveis.</p>
+                <p>Uma experiencia moderna para acompanhar gastos, metas e salario com contraste forte, navegacao consistente e temas personalizaveis.</p>
             </div>
             <div class="auth-pill-row">
-                <span class="auth-pill">Dashboard central</span>
+                <span class="auth-pill">Painel central</span>
                 <span class="auth-pill">Temas visuais</span>
                 <span class="auth-pill">Busca funcional</span>
             </div>
@@ -60,7 +60,7 @@
                             <label class="form-label">Senha</label>
                             <input type="password" name="senha" class="form-control" placeholder="********" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="submit" class="btn btn-primary">Entrar</button>
                     </form>
 
                     <div class="auth-foot mt-4">
@@ -72,3 +72,6 @@
     </div>
 </body>
 </html>
+
+
+

@@ -34,8 +34,8 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
     <div class="card-body">
         <form method="GET" class="row g-3">
             <div class="col-12">
-                <label class="form-label">Busca rápida</label>
-                <input type="search" name="q" class="form-control" value="<?= htmlspecialchars($busca ?? '') ?>" placeholder="Pesquisar por descrição ou categoria">
+                <label class="form-label">Busca rÃ¡pida</label>
+                <input type="search" name="q" class="form-control" value="<?= htmlspecialchars($busca ?? '') ?>" placeholder="Pesquisar por descriÃ§Ã£o ou categoria">
             </div>
             <div class="col-md-4">
                 <label class="form-label">Categoria</label>
@@ -49,7 +49,7 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
                 </select>
             </div>
             <div class="col-md-4">
-                <label class="form-label">Mês</label>
+                <label class="form-label">MÃªs</label>
                 <input type="month" name="mes" class="form-control" value="<?= $filtro_mes ?>">
             </div>
             <div class="col-md-4">
@@ -86,17 +86,17 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
                     <thead>
                         <tr>
                             <th>Data</th>
-                            <th>Descrição</th>
+                            <th>DescriÃ§Ã£o</th>
                             <th>Categoria</th>
                             <th class="text-end">Valor</th>
-                            <th class="text-center">Ações</th>
+                            <th class="text-center">AÃ§Ãµes</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($gastos as $gasto): ?>
                             <tr>
                                 <td><?= date('d/m/Y', strtotime($gasto['data_gasto'])) ?></td>
-                                <td><?= htmlspecialchars($gasto['descricao'] ?? '—') ?></td>
+                                <td><?= htmlspecialchars($gasto['descricao'] ?? 'â€”') ?></td>
                                 <td>
                                     <span class="badge-categoria"><?= htmlspecialchars($gasto['categoria']) ?></span>
                                 </td>
@@ -131,3 +131,4 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 <?php endif; ?>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+

@@ -1,36 +1,36 @@
 # GranaFlow
 
-Sistema web de gestao financeira pessoal com foco em TCC, desenvolvido em PHP com arquitetura MVC, MySQL, Bootstrap 5 e JavaScript.
+Sistema web de gestão financeira pessoal e empresarial desenvolvido em PHP, com arquitetura MVC, MySQL, Bootstrap 5 e JavaScript.
 
-## Visao geral
+## Visão geral
 
-O GranaFlow organiza gastos, metas, salario, categorias e historico de poupanca em uma interface responsiva, com suporte a dashboard, relatórios e exportacao de dados.
+O GranaFlow organiza gastos, receitas, metas, salário, categorias e histórico de poupança em uma interface responsiva, com suporte a painel principal, relatórios e exportação de dados.
 
-## Funcionalidades atuais
+## Funcionalidades
 
-- Autenticacao com cadastro, login e logout
-- Protecao CSRF em formularios
-- Dashboard com resumo financeiro e graficos
-- Cadastro, edicao e exclusao de gastos
-- Cadastro, edicao e exclusao de receitas
-- Filtros por categoria, mes, ordenacao e busca
-- Gastos recorrentes com geracao automatica mensal
-- Cadastro, edicao e exclusao de categorias
+- Autenticação com cadastro, login e logout
+- Proteção CSRF em formulários
+- Painel principal com resumo financeiro e gráficos
+- Cadastro, edição e exclusão de gastos
+- Cadastro, edição e exclusão de receitas
+- Filtros por categoria, mês, ordenação e busca
+- Gastos recorrentes com geração automática mensal
+- Cadastro, edição e exclusão de categorias
 - Metas financeiras do tipo controle e reserva
-- Guarda de dinheiro em metas e historico de poupanca
-- Registro e atualizacao de salario
-- Historico de salario
-- Relatorios com indicadores, receitas e grafico por categoria
-- Exportacao em CSV e JSON
-- Tema visual com alternancia de estilos
+- Guarda de dinheiro em metas e histórico de poupança
+- Registro e atualização de salário
+- Histórico de salário
+- Relatórios com indicadores, receitas e gráfico por categoria
+- Exportação em CSV e JSON
+- Tema visual com alternância de estilos
 - Interface responsiva para desktop e celular
 
 ## Estrutura principal
 
 ```text
 app/
-  Controllers/   Regras de negocio
-  Core/          Base do framework MVC
+  Controllers/   Regras de negócio
+  Core/          Base do MVC
   Models/        Acesso ao banco
   Views/         Telas do sistema
 public/
@@ -42,7 +42,7 @@ sql/
 
 ## Banco de dados
 
-O script principal de instalacao esta em `sql/banco_completo.sql`.
+O script principal de instalação está em `sql/banco_completo.sql`.
 
 Tabelas principais:
 
@@ -58,32 +58,32 @@ Tabelas principais:
 - `moedas`
 - `tipos_categoria`
 
-## Instalacao
+## Instalação
 
 1. Copie o projeto para o XAMPP, por exemplo em `C:\xampp\htdocs\GranaFLow`
 2. Inicie Apache e MySQL
 3. Importe `sql/banco_completo.sql` no phpMyAdmin
-4. Ajuste a conexao do banco em `app/Core/Model.php` se necessario
-5. Abra `http://localhost/GranaFLow/public/`
+4. Copie `.env.example` para `.env` e ajuste os dados do banco, se necessário
+5. Abra `http://localhost/GranaFLow/`
 
 ## Melhorias implementadas recentemente
 
-- Remocao de conflito de merge em `GastosController`
-- Correcao de validacao de propriedade em categorias
-- Inclusao de tela de edicao de categoria
-- Historico de salario
+- Remoção de conflito de merge em `GastosController`
+- Correção de validação de propriedade em categorias
+- Inclusão de tela de edição de categoria
+- Histórico de salário
 - Melhor tratamento de erro em `Controller` e `Model`
-- Indicadores adicionais no relatorio
-- Sugestao de login apos cadastro
+- Indicadores adicionais no relatório
+- Sugestão de login após cadastro
 
-## Proximos passos recomendados
+## Próximos passos recomendados
 
-- Adicionar modulo de receitas
-- Separar relatorio por periodo e categoria
-- Criar exportacao em PDF
-- Melhorar autenticacao com recuperacao de senha
-- Adicionar pagina de configuracoes do usuario
+- Adicionar módulo de receitas
+- Separar relatório por período e categoria
+- Criar exportação em PDF
+- Melhorar autenticação com recuperação de senha
+- Adicionar página de configurações do usuário
 
-## Observacao para TCC
+## Observação para TCC
 
-O projeto ja cobre uma base solida para demonstracao academica: CRUD completo, seguranca basica, dashboard, relatórios, exportacao e uma interface visual consistente.
+O projeto já cobre uma base sólida para demonstração acadêmica: CRUD completo, segurança básica, painel principal, relatórios, exportação e uma interface visual consistente.

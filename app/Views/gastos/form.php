@@ -25,7 +25,7 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
             </div>
 
             <div class="mb-3">
-                <label for="descricao" class="form-label">Descrição <span class="text-danger">*</span></label>
+                <label for="descricao" class="form-label">DescriÃ§Ã£o <span class="text-danger">*</span></label>
                 <input type="text" id="descricao" name="descricao" class="form-control" value="<?= isset($gasto) ? htmlspecialchars($gasto['descricao']) : '' ?>" placeholder="Ex: Compra no mercado" maxlength="255" required>
             </div>
 
@@ -55,3 +55,4 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 </div>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+

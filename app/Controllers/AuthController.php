@@ -15,29 +15,26 @@ class AuthController extends Controller
         $data = ['csrf_token' => $this->gerarTokenCSRF()];
 
         if (($_GET['status'] ?? '') === 'sucesso') {
-            $data['sucesso'] = 'Conta criada com sucesso. Agora faça login para continuar.';
+            $data['sucesso'] = 'Conta criada com sucesso. Agora faÃ§a login para continuar.';
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Validar CSRF
             if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-                $data['erro'] = "Solicitação inválida.";
+                $data['erro'] = "SolicitaÃ§Ã£o invÃ¡lida.";
                 $this->view('auth/login', $data);
                 return;
             }
 
             $email = $this->sanitizar($_POST['email'] ?? '');
             $senha = $_POST['senha'] ?? '';
-
-            // Validar entrada
             if (empty($email) || empty($senha)) {
-                $data['erro'] = "E-mail e senha são obrigatórios.";
+                $data['erro'] = "E-mail e senha sÃ£o obrigatÃ³rios.";
                 $this->view('auth/login', $data);
                 return;
             }
 
             if (!$this->validarEmail($email)) {
-                $data['erro'] = "E-mail inválido.";
+                $data['erro'] = "E-mail invÃ¡lido.";
                 $this->view('auth/login', $data);
                 return;
             }
@@ -63,9 +60,8 @@ class AuthController extends Controller
         $data = ['csrf_token' => $this->gerarTokenCSRF()];
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Validar CSRF
             if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-                $data['erro'] = "Solicitação inválida.";
+                $data['erro'] = "SolicitaÃ§Ã£o invÃ¡lida.";
                 $this->view('auth/cadastro', $data);
                 return;
             }
@@ -74,10 +70,8 @@ class AuthController extends Controller
             $email = $this->sanitizar($_POST['email'] ?? '');
             $senha = $_POST['senha'] ?? '';
             $confirmarSenha = $_POST['confirmar_senha'] ?? '';
-
-            // Validar entrada
             if (empty($nome) || empty($email) || empty($senha) || empty($confirmarSenha)) {
-                $data['erro'] = "Todos os campos são obrigatórios.";
+                $data['erro'] = "Todos os campos sÃ£o obrigatÃ³rios.";
                 $this->view('auth/cadastro', $data);
                 return;
             }
@@ -89,7 +83,7 @@ class AuthController extends Controller
             }
 
             if (!$this->validarEmail($email)) {
-                $data['erro'] = "E-mail inválido.";
+                $data['erro'] = "E-mail invÃ¡lido.";
                 $this->view('auth/cadastro', $data);
                 return;
             }
@@ -101,7 +95,7 @@ class AuthController extends Controller
             }
 
             if ($senha !== $confirmarSenha) {
-                $data['erro'] = "As senhas não coincidem.";
+                $data['erro'] = "As senhas nÃ£o coincidem.";
                 $this->view('auth/cadastro', $data);
                 return;
             }
@@ -110,7 +104,7 @@ class AuthController extends Controller
             if ($userModel->registrar($nome, $email, $senha)) {
                 redirecionar('auth/login?status=sucesso');
             } else {
-                $data['erro'] = "Erro ao cadastrar usuário. E-mail pode já estar em uso.";
+                $data['erro'] = "Erro ao cadastrar usuÃ¡rio. E-mail pode jÃ¡ estar em uso.";
                 $this->view('auth/cadastro', $data);
             }
         } else {
@@ -132,3 +126,4 @@ class AuthController extends Controller
         redirecionar('auth/login');
     }
 }
+

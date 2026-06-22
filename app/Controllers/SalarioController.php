@@ -12,11 +12,7 @@ class SalarioController extends Controller
             redirecionar('auth/login');
         }
     }
-
-    /**
-     * Exibe página de gerenciar salário
-     */
-    public function index()
+public function index()
     {
         $id_usuario = $_SESSION['id_usuario'];
         $salarioModel = $this->model('Salario');
@@ -31,38 +27,33 @@ class SalarioController extends Controller
 
         $this->view('salario/index', $data);
     }
-
-    /**
-     * Salva ou atualiza o salário
-     */
-    public function salvar()
+public function salvar()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirecionar('salario');
         }
 
         $id_usuario = $_SESSION['id_usuario'];
-
-        // Validar CSRF
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-            $_SESSION['erro'] = "Solicitação inválida.";
+            $_SESSION['erro'] = "SolicitaÃ§Ã£o invÃ¡lida.";
             redirecionar('salario');
         }
 
         $valor = floatval(str_replace(',', '.', $_POST['valor'] ?? 0));
 
         if (!$this->validarValor($valor)) {
-            $_SESSION['erro'] = "Valor do salário deve ser maior que zero.";
+            $_SESSION['erro'] = "Valor do salÃ¡rio deve ser maior que zero.";
             redirecionar('salario');
         }
 
         $salarioModel = $this->model('Salario');
         if ($salarioModel->setSalario($id_usuario, $valor)) {
-            $_SESSION['sucesso'] = "Salário atualizado com sucesso!";
+            $_SESSION['sucesso'] = "SalÃ¡rio atualizado com sucesso!";
         } else {
-            $_SESSION['erro'] = "Erro ao atualizar salário.";
+            $_SESSION['erro'] = "Erro ao atualizar salÃ¡rio.";
         }
 
         redirecionar('salario');
     }
 }
+

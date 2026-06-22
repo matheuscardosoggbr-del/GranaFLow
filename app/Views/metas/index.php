@@ -30,7 +30,7 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 
 <?php if (empty($metas)): ?>
     <div class="alert alert-info text-center">
-        <i class="bi bi-info-circle me-2"></i>Você ainda não criou nenhuma meta.
+        <i class="bi bi-info-circle me-2"></i>VocÃª ainda nÃ£o criou nenhuma meta.
     </div>
 <?php else: ?>
     <div class="row g-3">
@@ -93,3 +93,4 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 <?php endif; ?>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+

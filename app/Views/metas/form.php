@@ -50,3 +50,4 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 </div>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+

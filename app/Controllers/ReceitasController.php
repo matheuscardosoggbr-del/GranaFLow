@@ -68,7 +68,7 @@ class ReceitasController extends Controller
         }
 
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-            $_SESSION['erro'] = 'Solicitação inválida.';
+            $_SESSION['erro'] = 'SolicitaÃ§Ã£o invÃ¡lida.';
             redirecionar('receitas');
         }
 
@@ -79,7 +79,7 @@ class ReceitasController extends Controller
         $data_receita = $this->sanitizar($_POST['data_receita'] ?? '');
 
         if (empty($descricao) || strlen($descricao) > 255) {
-            $_SESSION['erro'] = 'Descrição inválida.';
+            $_SESSION['erro'] = 'DescriÃ§Ã£o invÃ¡lida.';
             redirecionar($id_receita > 0 ? "receitas/editar/$id_receita" : 'receitas/novo');
         }
 
@@ -89,7 +89,7 @@ class ReceitasController extends Controller
         }
 
         if (!$this->validarData($data_receita)) {
-            $_SESSION['erro'] = 'Data inválida.';
+            $_SESSION['erro'] = 'Data invÃ¡lida.';
             redirecionar($id_receita > 0 ? "receitas/editar/$id_receita" : 'receitas/novo');
         }
 
@@ -119,12 +119,12 @@ class ReceitasController extends Controller
         $id = intval($id ?? ($_GET['id'] ?? 0));
 
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-            $_SESSION['erro'] = 'Solicitação inválida.';
+            $_SESSION['erro'] = 'SolicitaÃ§Ã£o invÃ¡lida.';
             redirecionar('receitas');
         }
 
         if ($id <= 0) {
-            $_SESSION['erro'] = 'ID inválido.';
+            $_SESSION['erro'] = 'ID invÃ¡lido.';
             redirecionar('receitas');
         }
 
@@ -138,3 +138,4 @@ class ReceitasController extends Controller
         redirecionar('receitas');
     }
 }
+

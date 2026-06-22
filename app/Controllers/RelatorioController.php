@@ -12,11 +12,7 @@ class RelatorioController extends Controller
             redirecionar('auth/login');
         }
     }
-
-    /**
-     * Exibe página de relatórios
-     */
-    public function index()
+public function index()
     {
         $id_usuario = $_SESSION['id_usuario'];
         $gastoModel = $this->model('Gasto');
@@ -28,8 +24,6 @@ class RelatorioController extends Controller
         $receitas = $receitaModel->getReceitas($id_usuario);
         $metas = $metaModel->getMetas($id_usuario);
         $salario = $salarioModel->getSalario($id_usuario);
-
-        // Estatísticas
         $total_gastos = array_sum(array_column($gastos, 'valor'));
         $mes_atual = date('m');
         $ano_atual = date('Y');
@@ -46,8 +40,6 @@ class RelatorioController extends Controller
         $total_receitas_mes = array_sum(array_column($receitas_mes, 'valor'));
         $saldo_estimado = $salario + $total_receitas_mes - $total_mes;
         $percentual_consumido = $salario > 0 ? min(100, ($total_mes / $salario) * 100) : 0;
-
-        // Gastos por categoria
         $gastos_categoria = [];
         foreach ($gastos as $g) {
             if (!isset($gastos_categoria[$g['categoria']])) {
@@ -56,8 +48,6 @@ class RelatorioController extends Controller
             $gastos_categoria[$g['categoria']] += $g['valor'];
         }
         arsort($gastos_categoria);
-
-        // Progresso de metas
         $total_metas = count($metas);
         $metas_atingidas = count(array_filter($metas, function ($m) {
             return $m['valor_guardado'] >= $m['valor_limite'];
@@ -82,27 +72,15 @@ class RelatorioController extends Controller
 
         $this->view('relatorios/index', $data);
     }
-
-    /**
-     * Exporta relatório em CSV
-     */
-    public function exportarCSV()
+public function exportarCSV()
     {
         $id_usuario = $_SESSION['id_usuario'];
         $gastoModel = $this->model('Gasto');
         $gastos = $gastoModel->getGastos($id_usuario);
-
-        // Headers para download
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="relatorio_gastos_' . date('Y-m-d') . '.csv"');
-
-        // BOM para UTF-8
         echo "\xEF\xBB\xBF";
-
-        // Cabeçalho
-        echo "Data,Descrição,Categoria,Valor\n";
-
-        // Dados
+        echo "Data,DescriÃ§Ã£o,Categoria,Valor\n";
         $sanitizarCsv = function ($valor) {
             $valor = (string) $valor;
             $valor = str_replace(["\r", "\n"], [' ', ' '], $valor);
@@ -123,11 +101,7 @@ class RelatorioController extends Controller
 
         exit;
     }
-
-    /**
-     * Exporta relatório em JSON
-     */
-    public function exportarJSON()
+public function exportarJSON()
     {
         $id_usuario = $_SESSION['id_usuario'];
         $gastoModel = $this->model('Gasto');
@@ -176,3 +150,4 @@ class RelatorioController extends Controller
         exit;
     }
 }
+

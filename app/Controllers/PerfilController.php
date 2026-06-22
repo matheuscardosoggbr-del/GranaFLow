@@ -21,7 +21,7 @@ class PerfilController extends Controller
         $data = [
             'csrf_token' => $this->gerarTokenCSRF(),
             'usuario' => $usuario,
-            'nome_usuario' => $usuario['nome'] ?? ($_SESSION['nome'] ?? 'Usuário'),
+            'nome_usuario' => $usuario['nome'] ?? ($_SESSION['nome'] ?? 'UsuÃ¡rio'),
         ];
 
         $this->view('perfil/index', $data);
@@ -34,7 +34,7 @@ class PerfilController extends Controller
         }
 
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-            $_SESSION['erro'] = 'Solicitação inválida.';
+            $_SESSION['erro'] = 'SolicitaÃ§Ã£o invÃ¡lida.';
             redirecionar('perfil');
         }
 
@@ -48,21 +48,21 @@ class PerfilController extends Controller
         }
 
         if (!$this->validarEmail($email)) {
-            $_SESSION['erro'] = 'Informe um e-mail válido.';
+            $_SESSION['erro'] = 'Informe um e-mail vÃ¡lido.';
             redirecionar('perfil');
         }
 
         $userModel = $this->model('User');
         $atual = $userModel->getById($id_usuario);
         if (!$atual) {
-            $_SESSION['erro'] = 'Usuário não encontrado.';
+            $_SESSION['erro'] = 'UsuÃ¡rio nÃ£o encontrado.';
             redirecionar('perfil');
         }
 
         if ($userModel->atualizarPerfil($id_usuario, $nome, $email, null)) {
             $_SESSION['sucesso'] = 'Perfil atualizado com sucesso.';
         } else {
-            $_SESSION['erro'] = 'Não foi possível atualizar o perfil.';
+            $_SESSION['erro'] = 'NÃ£o foi possÃ­vel atualizar o perfil.';
         }
 
         redirecionar('perfil');
@@ -75,7 +75,7 @@ class PerfilController extends Controller
         }
 
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-            $_SESSION['erro'] = 'Solicitação inválida.';
+            $_SESSION['erro'] = 'SolicitaÃ§Ã£o invÃ¡lida.';
             redirecionar('perfil');
         }
 
@@ -89,7 +89,7 @@ class PerfilController extends Controller
         }
 
         if ($senhaNova !== $confirmar) {
-            $_SESSION['erro'] = 'As senhas não coincidem.';
+            $_SESSION['erro'] = 'As senhas nÃ£o coincidem.';
             redirecionar('perfil');
         }
 
@@ -103,3 +103,4 @@ class PerfilController extends Controller
         redirecionar('perfil');
     }
 }
+

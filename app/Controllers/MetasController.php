@@ -12,11 +12,7 @@ class MetasController extends Controller
             redirecionar('auth/login');
         }
     }
-
-    /**
-     * Lista todas as metas do usuário
-     */
-    public function index()
+public function index()
     {
         $id_usuario = $_SESSION['id_usuario'];
         $metaModel = $this->model('Meta');
@@ -29,11 +25,7 @@ class MetasController extends Controller
 
         $this->view('metas/index', $data);
     }
-
-    /**
-     * Exibe formulário de nova meta
-     */
-    public function novo()
+public function novo()
     {
         $data = [
             'csrf_token' => $this->gerarTokenCSRF(),
@@ -41,11 +33,7 @@ class MetasController extends Controller
 
         $this->view('metas/form', $data);
     }
-
-    /**
-     * Exibe formulário de edição
-     */
-    public function editar($id)
+public function editar($id)
     {
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id);
@@ -64,11 +52,7 @@ class MetasController extends Controller
 
         $this->view('metas/form', $data);
     }
-
-    /**
-     * Salva nova meta ou edita existente (suporta formulários tradicionais e AJAX)
-     */
-    public function salvar()
+public function salvar()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirecionar('metas');
@@ -76,34 +60,26 @@ class MetasController extends Controller
 
         $id_usuario = $_SESSION['id_usuario'];
         $isAjax = $this->isAjax();
-
-        // Validar CSRF para todas as requisições POST
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-            $erro = "Solicitação inválida (CSRF).";
+            $erro = "SolicitaÃ§Ã£o invÃ¡lida (CSRF).";
             if ($isAjax) {
                 $this->jsonResponse(false, $erro);
             }
             $_SESSION['erro'] = $erro;
             redirecionar('metas');
         }
-
-        // Validar entrada
         $id_meta = intval($_POST['id_meta'] ?? 0);
         $nome = $this->sanitizar($_POST['nome_meta'] ?? '');
         $valor = floatval(str_replace(',', '.', $_POST['valor_limite'] ?? 0));
         $tipo = $this->sanitizar($_POST['tipo'] ?? 'gasto');
-
-        // Validação: Nome
         if (empty($nome) || strlen($nome) > 50) {
-            $erro = "Nome da meta inválido (máx 50 caracteres).";
+            $erro = "Nome da meta invÃ¡lido (mÃ¡x 50 caracteres).";
             if ($isAjax) {
                 $this->jsonResponse(false, $erro);
             }
             $_SESSION['erro'] = $erro;
             redirecionar($id_meta > 0 ? "metas/editar/$id_meta" : 'metas/novo');
         }
-
-        // Validação: Valor
         if (!$this->validarValor($valor)) {
             $erro = "Valor deve ser maior que zero.";
             if ($isAjax) {
@@ -112,10 +88,8 @@ class MetasController extends Controller
             $_SESSION['erro'] = $erro;
             redirecionar($id_meta > 0 ? "metas/editar/$id_meta" : 'metas/novo');
         }
-
-        // Validação: Tipo
         if (!in_array($tipo, ['gasto', 'reserva'])) {
-            $erro = "Tipo de meta inválido.";
+            $erro = "Tipo de meta invÃ¡lido.";
             if ($isAjax) {
                 $this->jsonResponse(false, $erro);
             }
@@ -126,7 +100,6 @@ class MetasController extends Controller
         $metaModel = $this->model('Meta');
 
         if ($id_meta > 0) {
-            // Editar
             $meta = $metaModel->getMetaById($id_meta, $id_usuario);
             if (!$meta) {
                 $erro = "Acesso negado.";
@@ -139,7 +112,6 @@ class MetasController extends Controller
             $sucesso = $metaModel->atualizar($id_meta, $nome, $valor, $tipo);
             $mensagem = "Meta atualizada com sucesso!";
         } else {
-            // Novo
             $sucesso = $metaModel->adicionar($id_usuario, $nome, $valor, $tipo);
             $mensagem = "Meta adicionada com sucesso!";
         }
@@ -159,21 +131,13 @@ class MetasController extends Controller
 
         redirecionar('metas');
     }
-
-    /**
-     * Verifica se é requisição AJAX
-     */
-    private function isAjax()
+private function isAjax()
     {
         return isset($_POST['_ajax']) || isset($_GET['_ajax']) || 
                (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                 strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
     }
-
-    /**
-     * Retorna resposta JSON
-     */
-    private function jsonResponse($success, $message = '', $data = [])
+private function jsonResponse($success, $message = '', $data = [])
     {
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
@@ -183,11 +147,7 @@ class MetasController extends Controller
         ]);
         exit;
     }
-
-    /**
-     * Adiciona meta (com suporte AJAX)
-     */
-    public function adicionar()
+public function adicionar()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirecionar('metas');
@@ -196,13 +156,11 @@ class MetasController extends Controller
         $id_usuario = $_SESSION['id_usuario'];
         $nome = $this->sanitizar($_POST['nome_meta'] ?? '');
         $valor = floatval(str_replace(',', '.', $_POST['valor_limite'] ?? 0));
-
-        // Validações
         if (empty($nome) || strlen($nome) > 50) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'Nome da meta inválido (máx 50 caracteres).');
+                $this->jsonResponse(false, 'Nome da meta invÃ¡lido (mÃ¡x 50 caracteres).');
             }
-            $_SESSION['erro'] = "Nome da meta inválido.";
+            $_SESSION['erro'] = "Nome da meta invÃ¡lido.";
             redirecionar('metas/novo');
         }
 
@@ -229,28 +187,24 @@ class MetasController extends Controller
 
         redirecionar('metas');
     }
-
-    /**
-     * Deleta uma meta
-     */
-    public function deletar($id = null)
+public function deletar($id = null)
     {
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id ?? ($_GET['id'] ?? 0));
 
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'Solicitação inválida.');
+                $this->jsonResponse(false, 'SolicitaÃ§Ã£o invÃ¡lida.');
             }
-            $_SESSION['erro'] = "Solicitação inválida.";
+            $_SESSION['erro'] = "SolicitaÃ§Ã£o invÃ¡lida.";
             redirecionar('metas');
         }
 
         if ($id <= 0) {
             if ($this->isAjax()) {
-                $this->jsonResponse(false, 'ID inválido.');
+                $this->jsonResponse(false, 'ID invÃ¡lido.');
             }
-            $_SESSION['erro'] = "ID inválido.";
+            $_SESSION['erro'] = "ID invÃ¡lido.";
             redirecionar('metas');
         }
 
@@ -279,11 +233,7 @@ class MetasController extends Controller
 
         redirecionar('metas');
     }
-
-    /**
-     * Guarda dinheiro em uma meta
-     */
-    public function guardar($id)
+public function guardar($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirecionar('metas');
@@ -291,17 +241,15 @@ class MetasController extends Controller
 
         $id_usuario = $_SESSION['id_usuario'];
         $id = intval($id);
-
-        // Validar CSRF
         if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {
-            $_SESSION['erro'] = "Solicitação inválida.";
+            $_SESSION['erro'] = "SolicitaÃ§Ã£o invÃ¡lida.";
             redirecionar('metas');
         }
 
         $valor = floatval(str_replace(',', '.', $_POST['valor'] ?? 0));
 
         if (!$this->validarValor($valor)) {
-            $_SESSION['erro'] = "Valor inválido.";
+            $_SESSION['erro'] = "Valor invÃ¡lido.";
             redirecionar('metas');
         }
 
@@ -309,7 +257,7 @@ class MetasController extends Controller
         $meta = $metaModel->getMetaById($id, $id_usuario);
         
         if (!$meta) {
-            $_SESSION['erro'] = "Meta não encontrada.";
+            $_SESSION['erro'] = "Meta nÃ£o encontrada.";
             redirecionar('metas');
         }
 
@@ -321,12 +269,7 @@ class MetasController extends Controller
 
         redirecionar('metas');
     }
-
-
-    /**
-     * Retorna dados mínimos do dashboard para atualização em tempo real
-     */
-    private function getDashData($id_usuario)
+private function getDashData($id_usuario)
     {
         $gastoModel    = $this->model('Gasto');
         $metaModel     = $this->model('Meta');
@@ -359,3 +302,4 @@ class MetasController extends Controller
     }
 
 }
+

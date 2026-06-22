@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Perfil';
-$pageKicker = 'Configurações';
+$pageKicker = 'ConfiguraÃ§Ãµes';
 $pageHeading = 'Meu Perfil';
 $activePage = '';
 require_once dirname(__DIR__) . '/partials/shell_top.php';
@@ -37,19 +37,19 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
                         <?= strtoupper(substr($usuario['nome'] ?? ($_SESSION['nome'] ?? 'U'), 0, 1)) ?>
                     </div>
                     <div>
-                        <div class="fw-bold" style="font-size:1.1rem;"><?= htmlspecialchars($usuario['nome'] ?? ($_SESSION['nome'] ?? 'Usuário')) ?></div>
+                        <div class="fw-bold" style="font-size:1.1rem;"><?= htmlspecialchars($usuario['nome'] ?? ($_SESSION['nome'] ?? 'UsuÃ¡rio')) ?></div>
                         <div class="page-subtitle"><?= htmlspecialchars($usuario['email'] ?? ($_SESSION['email'] ?? '')) ?></div>
                     </div>
                 </div>
 
                 <div class="mb-2">
-                    <small class="page-subtitle">ID do usuário</small>
+                    <small class="page-subtitle">ID do usuÃ¡rio</small>
                     <div class="fw-semibold">#<?= (int) ($_SESSION['id_usuario'] ?? 0) ?></div>
                 </div>
 
                 <div class="mb-2">
                     <small class="page-subtitle">Conta criada em</small>
-                    <div class="fw-semibold"><?= htmlspecialchars($usuario['data_criacao'] ?? '—') ?></div>
+                    <div class="fw-semibold"><?= htmlspecialchars($usuario['data_criacao'] ?? 'â€”') ?></div>
                 </div>
             </div>
         </div>
@@ -76,7 +76,7 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
                     </div>
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary btn-acao">
-                            <i class="bi bi-check2 me-2"></i>Salvar alterações
+                            <i class="bi bi-check2 me-2"></i>Salvar alteraÃ§Ãµes
                         </button>
                     </div>
                 </form>
@@ -117,3 +117,4 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 </div>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+

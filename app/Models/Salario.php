@@ -6,10 +6,7 @@ use App\Core\Model;
 
 class Salario extends Model
 {
-    /**
-     * Obtém o salário do usuário
-     */
-    public function getSalario($id_usuario)
+public function getSalario($id_usuario)
     {
         $stmt = $this->db->prepare("SELECT valor FROM salarios WHERE id_usuario = ? LIMIT 1");
         $stmt->bind_param("i", $id_usuario);
@@ -17,13 +14,8 @@ class Salario extends Model
         $row = $stmt->get_result()->fetch_assoc();
         return $row ? floatval($row['valor']) : 0.0;
     }
-
-    /**
-     * Define ou atualiza o salário
-     */
-    public function setSalario($id_usuario, $valor)
+public function setSalario($id_usuario, $valor)
     {
-        // Verificar se já existe
         $check = $this->db->prepare("SELECT id, valor FROM salarios WHERE id_usuario = ?");
         $check->bind_param("i", $id_usuario);
         $check->execute();
@@ -33,12 +25,9 @@ class Salario extends Model
             $historico = $this->db->prepare("INSERT INTO salarios_historico (id_usuario, valor) VALUES (?, ?)");
             $historico->bind_param("id", $id_usuario, $rowAtual['valor']);
             $historico->execute();
-
-            // Atualizar
             $stmt = $this->db->prepare("UPDATE salarios SET valor = ? WHERE id_usuario = ?");
             $stmt->bind_param("di", $valor, $id_usuario);
         } else {
-            // Inserir
             $stmt = $this->db->prepare("INSERT INTO salarios (id_usuario, valor) VALUES (?, ?)");
             $stmt->bind_param("id", $id_usuario, $valor);
         }
@@ -52,19 +41,11 @@ class Salario extends Model
 
         return $sucesso;
     }
-
-    /**
-     * Alias para setSalario (compatibilidade)
-     */
-    public function salvar($valor, $id_usuario)
+public function salvar($valor, $id_usuario)
     {
         return $this->setSalario($id_usuario, $valor);
     }
-
-    /**
-     * Obtém histórico de salários
-     */
-    public function getHistorico($id_usuario, $limitar = null)
+public function getHistorico($id_usuario, $limitar = null)
     {
         $sql = "SELECT id, id_usuario, valor, data_registro,
                        DATE_FORMAT(data_registro, '%d/%m/%Y %H:%i') as data_formatada
@@ -88,3 +69,4 @@ class Salario extends Model
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 }
+

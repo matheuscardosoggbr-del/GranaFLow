@@ -11,14 +11,10 @@ class App
     public function __construct()
     {
         $url = $this->parseUrl();
-
-        // Se URL vazia → vai direto para AuthController->login
         if (empty($url) || empty($url[0])) {
             $this->chamar();
             return;
         }
-
-        // Define o controller a partir do primeiro segmento da URL
         $route = strtolower($url[0]);
         $aliases = [
             'categoria' => 'CategoriaController',
@@ -33,7 +29,6 @@ class App
         $controllerArquivo = dirname(__DIR__) . '/Controllers/' . $controllerNome . '.php';
 
         if (!file_exists($controllerArquivo)) {
-            // Controller não encontrado → fallback para login
             $this->chamar();
             return;
         }
@@ -44,15 +39,11 @@ class App
 
         $controllerClass = 'App\\Controllers\\' . $this->controller;
         $controllerObj   = new $controllerClass();
-
-        // Define o método a partir do segundo segmento
         if (!empty($url[0]) && method_exists($controllerObj, $url[0])) {
             $this->method = $url[0];
             unset($url[0]);
             $url = array_values($url);
         } else {
-            // Método não informado → usa o padrão do controller
-            // Para Auth o padrão é login, para Dashboard é index, etc.
             $defaults = [
                 'AuthController'      => 'login',
                 'DashboardController' => 'index',
@@ -85,3 +76,4 @@ class App
         call_user_func_array([$obj, $this->method], $this->params);
     }
 }
+

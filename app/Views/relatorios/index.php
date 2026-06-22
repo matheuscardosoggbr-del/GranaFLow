@@ -1,7 +1,7 @@
 <?php
-$pageTitle = 'Relatórios';
+$pageTitle = 'RelatÃ³rios';
 $pageKicker = 'Finance CRM';
-$pageHeading = 'Relatórios';
+$pageHeading = 'RelatÃ³rios';
 $activePage = 'relatorios';
 require_once dirname(__DIR__) . '/partials/shell_top.php';
 ?>
@@ -18,11 +18,11 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 </div>
 
 <div class="row g-3 mb-4">
-    <div class="col-md-3"><div class="card card-resumo"><div class="card-body"><div class="card-resumo-icon" style="background:rgba(248,113,113,0.1);color:var(--red);"><i class="bi bi-graph-up"></i></div><h6>Total de Gastos</h6><div class="valor">R$ <?= number_format($total_gastos, 2, ',', '.') ?></div><small class="page-subtitle"><?= $quantidade_gastos ?> transações</small></div></div></div>
-    <div class="col-md-3"><div class="card card-resumo"><div class="card-body"><div class="card-resumo-icon" style="background:rgba(251,191,36,0.1);color:var(--yellow);"><i class="bi bi-calendar3"></i></div><h6>Gasto este Mês</h6><div class="valor">R$ <?= number_format($total_mes, 2, ',', '.') ?></div><small class="page-subtitle"><?= $quantidade_mes ?> transações</small></div></div></div>
-    <div class="col-md-3"><div class="card card-resumo"><div class="card-body"><div class="card-resumo-icon" style="background:rgba(52,211,153,0.1);color:var(--green);"><i class="bi bi-bullseye"></i></div><h6>Metas Atingidas</h6><div class="valor"><?= $metas_atingidas ?>/<?= $total_metas ?></div><small class="page-subtitle"><?= $total_metas > 0 ? number_format(($metas_atingidas / $total_metas * 100), 0) : 0 ?>% concluídas</small></div></div></div>
-    <div class="col-md-3"><div class="card card-resumo"><div class="card-body"><div class="card-resumo-icon" style="background:rgba(124,106,247,0.12);color:var(--accent);"><i class="bi bi-wallet2"></i></div><h6>Saldo Estimado</h6><div class="valor">R$ <?= number_format($saldo_estimado ?? 0, 2, ',', '.') ?></div><small class="page-subtitle"><?= number_format($percentual_consumido ?? 0, 0) ?>% do salário consumido</small></div></div></div>
-    <div class="col-md-3"><div class="card card-resumo"><div class="card-body"><div class="card-resumo-icon" style="background:rgba(14,165,233,0.1);color:#0ea5e9;"><i class="bi bi-arrow-down-circle"></i></div><h6>Receitas do Mês</h6><div class="valor">R$ <?= number_format($total_receitas_mes ?? 0, 2, ',', '.') ?></div><small class="page-subtitle"><?= $quantidade_receitas ?? 0 ?> entradas</small></div></div></div>
+    <div class="col-md-3"><div class="card card-resumo"><div class="card-body"><div class="card-resumo-icon" style="background:rgba(248,113,113,0.1);color:var(--red);"><i class="bi bi-graph-up"></i></div><h6>Total de Gastos</h6><div class="valor">R$ <?= number_format($total_gastos, 2, ',', '.') ?></div><small class="page-subtitle"><?= $quantidade_gastos ?> transaÃ§Ãµes</small></div></div></div>
+    <div class="col-md-3"><div class="card card-resumo"><div class="card-body"><div class="card-resumo-icon" style="background:rgba(251,191,36,0.1);color:var(--yellow);"><i class="bi bi-calendar3"></i></div><h6>Gasto este MÃªs</h6><div class="valor">R$ <?= number_format($total_mes, 2, ',', '.') ?></div><small class="page-subtitle"><?= $quantidade_mes ?> transaÃ§Ãµes</small></div></div></div>
+    <div class="col-md-3"><div class="card card-resumo"><div class="card-body"><div class="card-resumo-icon" style="background:rgba(52,211,153,0.1);color:var(--green);"><i class="bi bi-bullseye"></i></div><h6>Metas Atingidas</h6><div class="valor"><?= $metas_atingidas ?>/<?= $total_metas ?></div><small class="page-subtitle"><?= $total_metas > 0 ? number_format(($metas_atingidas / $total_metas * 100), 0) : 0 ?>% concluÃ­das</small></div></div></div>
+    <div class="col-md-3"><div class="card card-resumo"><div class="card-body"><div class="card-resumo-icon" style="background:rgba(124,106,247,0.12);color:var(--accent);"><i class="bi bi-wallet2"></i></div><h6>Saldo Estimado</h6><div class="valor">R$ <?= number_format($saldo_estimado ?? 0, 2, ',', '.') ?></div><small class="page-subtitle"><?= number_format($percentual_consumido ?? 0, 0) ?>% do salÃ¡rio consumido</small></div></div></div>
+    <div class="col-md-3"><div class="card card-resumo"><div class="card-body"><div class="card-resumo-icon" style="background:rgba(14,165,233,0.1);color:#0ea5e9;"><i class="bi bi-arrow-down-circle"></i></div><h6>Receitas do MÃªs</h6><div class="valor">R$ <?= number_format($total_receitas_mes ?? 0, 2, ',', '.') ?></div><small class="page-subtitle"><?= $quantidade_receitas ?? 0 ?> entradas</small></div></div></div>
 </div>
 
 <div class="row g-3 mb-4">
@@ -80,3 +80,4 @@ if (ctxCategoria) {
 </script>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+

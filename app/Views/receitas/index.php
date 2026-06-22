@@ -32,11 +32,11 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
     <div class="card-body">
         <form method="GET" class="row g-3">
             <div class="col-12">
-                <label class="form-label">Busca rápida</label>
-                <input type="search" name="q" class="form-control" value="<?= htmlspecialchars($busca ?? '') ?>" placeholder="Pesquisar por descrição">
+                <label class="form-label">Busca rÃ¡pida</label>
+                <input type="search" name="q" class="form-control" value="<?= htmlspecialchars($busca ?? '') ?>" placeholder="Pesquisar por descriÃ§Ã£o">
             </div>
             <div class="col-md-6">
-                <label class="form-label">Mês</label>
+                <label class="form-label">MÃªs</label>
                 <input type="month" name="mes" class="form-control" value="<?= $filtro_mes ?>">
             </div>
             <div class="col-md-6">
@@ -72,16 +72,16 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
                     <thead>
                         <tr>
                             <th>Data</th>
-                            <th>Descrição</th>
+                            <th>DescriÃ§Ã£o</th>
                             <th class="text-end">Valor</th>
-                            <th class="text-center">Ações</th>
+                            <th class="text-center">AÃ§Ãµes</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($receitas as $receita): ?>
                             <tr>
                                 <td><?= date('d/m/Y', strtotime($receita['data_receita'])) ?></td>
-                                <td><?= htmlspecialchars($receita['descricao'] ?? '—') ?></td>
+                                <td><?= htmlspecialchars($receita['descricao'] ?? 'â€”') ?></td>
                                 <td class="text-end">
                                     <span class="valor-gasto text-success">
                                         <?= $receita['simbolo'] ?> <?= number_format($receita['valor'], 2, ',', '.') ?>
@@ -113,3 +113,4 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 <?php endif; ?>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+

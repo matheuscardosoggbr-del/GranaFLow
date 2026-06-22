@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro — GranaFlow</title>
+    <title>Cadastro - GranaFlow</title>
     <script src="<?= BASE_URL ?>js/theme.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -19,12 +19,12 @@
             </div>
             <div class="auth-hero-copy">
                 <h1>Uma conta para organizar sua vida financeira com mais clareza.</h1>
-                <p>Cadastre-se e acompanhe gastos, metas e salário com uma interface limpa, responsiva e com temas bem contrastados.</p>
+                <p>Cadastre-se e acompanhe gastos, metas e salario com uma interface limpa, responsiva e com temas bem contrastados.</p>
             </div>
             <div class="auth-pill-row">
                 <span class="auth-pill">Controle de gastos</span>
-                <span class="auth-pill">Metas e salário</span>
-                <span class="auth-pill">Visual premium</span>
+                <span class="auth-pill">Metas e salario</span>
+                <span class="auth-pill">Visual principal</span>
             </div>
         </section>
 
@@ -75,3 +75,6 @@
     </div>
 </body>
 </html>
+
+
+

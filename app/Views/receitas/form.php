@@ -13,10 +13,10 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
             <input type="hidden" name="id_receita" value="<?= isset($receita) ? $receita['id_receita'] : 0 ?>">
 
             <div class="mb-3">
-                <label for="descricao" class="form-label">Descrição <span class="text-danger">*</span></label>
+                <label for="descricao" class="form-label">DescriÃ§Ã£o <span class="text-danger">*</span></label>
                 <input type="text" id="descricao" name="descricao" class="form-control"
                     value="<?= isset($receita) ? htmlspecialchars($receita['descricao']) : '' ?>"
-                    placeholder="Ex: Freela, venda, salário extra" maxlength="255" required>
+                    placeholder="Ex: Freela, venda, salÃ¡rio extra" maxlength="255" required>
             </div>
 
             <div class="mb-3">
@@ -48,3 +48,4 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
 </div>
 
 <?php require_once dirname(__DIR__) . '/partials/shell_bottom.php'; ?>
+
