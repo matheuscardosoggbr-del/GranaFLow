@@ -88,10 +88,40 @@
         }
     }
 
+    function initFlyouts() {
+        document.querySelectorAll('[data-crm-flyout]').forEach((btn) => {
+            const key = btn.getAttribute('data-crm-flyout');
+            const menu = document.querySelector(`[data-flyout="${key}"]`);
+            if (!menu) return;
+
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isOpen = menu.classList.toggle('open');
+                btn.setAttribute('aria-expanded', String(isOpen));
+
+                document.querySelectorAll('.crm-flyout.open').forEach((other) => {
+                    if (other !== menu) other.classList.remove('open');
+                });
+                document.querySelectorAll('[data-crm-flyout]').forEach((otherBtn) => {
+                    if (otherBtn !== btn) otherBtn.setAttribute('aria-expanded', 'false');
+                });
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.crm-flyout') && !e.target.closest('[data-crm-flyout]')) {
+                document.querySelectorAll('.crm-flyout.open').forEach((menu) => menu.classList.remove('open'));
+                document.querySelectorAll('[data-crm-flyout]').forEach((btn) => btn.setAttribute('aria-expanded', 'false'));
+            }
+        });
+    }
+
     const saved = getSavedTheme();
     applyTheme(saved);
 
     document.addEventListener('DOMContentLoaded', function () {
         injectThemePicker();
+        initFlyouts();
     });
 })();

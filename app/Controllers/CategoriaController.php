@@ -42,7 +42,7 @@ class CategoriaController extends Controller
         $categoria = $categoriaModel->getCategoriaById($id);
         
         // Verificar se a categoria pertence ao usuário
-        if (!$categoria || $categoria['id_usuario'] !== $id_usuario) {
+        if (!$categoria || (int)($categoria['id_usuario'] ?? 0) !== (int)$id_usuario) {
             $_SESSION['erro'] = "Acesso negado.";
             redirecionar('categorias');
         }
@@ -94,13 +94,13 @@ class CategoriaController extends Controller
             $categoria = $categoriaModel->getCategoriaById($id_categoria);
             
             // Verificar se a categoria pertence ao usuário
-            if (!$categoria || $categoria['id_usuario'] !== $id_usuario) {
+            if (!$categoria || (int)($categoria['id_usuario'] ?? 0) !== (int)$id_usuario) {
                 $_SESSION['erro'] = "Acesso negado.";
                 redirecionar('categorias');
             }
 
-            // Não permitir editar categorias padrão (id_tipo = 0)
-            if ($categoria['id_tipo'] === 0) {
+            // Não permitir editar categorias padrão
+            if (empty($categoria['id_usuario'])) {
                 $_SESSION['erro'] = "Não é possível editar categorias padrão.";
                 redirecionar('categorias');
             }
@@ -139,13 +139,13 @@ class CategoriaController extends Controller
 
         // Verificar se a categoria pertence ao usuário
         $categoria = $categoriaModel->getCategoriaById($id);
-        if (!$categoria || $categoria['id_usuario'] !== $id_usuario) {
+        if (!$categoria || (int)($categoria['id_usuario'] ?? 0) !== (int)$id_usuario) {
             $_SESSION['erro'] = "Acesso negado.";
             redirecionar('categorias');
         }
 
         // Não permitir deletar categorias padrão
-        if ($categoria['id_tipo'] === 0) {
+        if (empty($categoria['id_usuario'])) {
             $_SESSION['erro'] = "Não é possível deletar categorias padrão.";
             redirecionar('categorias');
         }

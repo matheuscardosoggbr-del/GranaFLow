@@ -19,7 +19,10 @@ class Model
         $this->db = new mysqli($host, $usuario, $senha, $banco, $porta);
 
         if ($this->db->connect_error) {
-            die("Erro ao conectar ao banco de dados: " . $this->db->connect_error . " (Verifique se o MySQL está rodando na porta $porta)");
+            throw new \RuntimeException(
+                "Erro ao conectar ao banco de dados: " . $this->db->connect_error .
+                " (Verifique se o MySQL está rodando na porta $porta)"
+            );
         }
 
         $this->db->set_charset("utf8mb4");

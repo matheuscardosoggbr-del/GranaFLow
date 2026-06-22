@@ -19,7 +19,17 @@ class App
         }
 
         // Define o controller a partir do primeiro segmento da URL
-        $controllerNome    = ucfirst(strtolower($url[0])) . 'Controller';
+        $route = strtolower($url[0]);
+        $aliases = [
+            'categoria' => 'CategoriaController',
+            'categorias' => 'CategoriaController',
+            'perfil' => 'PerfilController',
+            'relatorio' => 'RelatorioController',
+            'relatorios' => 'RelatorioController',
+            'receita' => 'ReceitasController',
+            'receitas' => 'ReceitasController',
+        ];
+        $controllerNome = $aliases[$route] ?? (ucfirst($route) . 'Controller');
         $controllerArquivo = dirname(__DIR__) . '/Controllers/' . $controllerNome . '.php';
 
         if (!file_exists($controllerArquivo)) {

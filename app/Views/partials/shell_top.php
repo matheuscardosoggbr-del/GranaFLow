@@ -3,12 +3,13 @@ $pageTitle = $pageTitle ?? 'GranaFlow';
 $pageKicker = $pageKicker ?? 'Dashboard';
 $pageHeading = $pageHeading ?? $pageTitle;
 $activePage = $activePage ?? 'dashboard';
-$userName = $nome_usuario ?? ($_SESSION['nome_usuario'] ?? 'Usuário');
+$userName = $nome_usuario ?? ($_SESSION['nome_usuario'] ?? ($_SESSION['nome'] ?? 'Usuário'));
 $userEmail = $_SESSION['email'] ?? '';
 
 $navItems = [
-    'dashboard' => ['label' => 'Home page', 'icon' => 'house-door', 'href' => BASE_URL . 'dashboard'],
+    'dashboard' => ['label' => 'Dashboard', 'icon' => 'house-door', 'href' => BASE_URL . 'dashboard'],
     'gastos' => ['label' => 'Gastos', 'icon' => 'receipt', 'href' => BASE_URL . 'gastos'],
+    'receitas' => ['label' => 'Receitas', 'icon' => 'cash-coin', 'href' => BASE_URL . 'receitas'],
     'metas' => ['label' => 'Metas', 'icon' => 'bullseye', 'href' => BASE_URL . 'metas'],
     'categorias' => ['label' => 'Categorias', 'icon' => 'tags', 'href' => BASE_URL . 'categorias'],
     'relatorios' => ['label' => 'Relatórios', 'icon' => 'bar-chart', 'href' => BASE_URL . 'relatorio'],
@@ -43,7 +44,7 @@ $navItems = [
 
             <label class="crm-search">
                 <i class="bi bi-search"></i>
-                <input type="search" placeholder="Search..." aria-label="Search">
+                <input type="search" placeholder="Buscar..." aria-label="Buscar">
             </label>
 
             <div class="crm-sidebar-section">
@@ -68,12 +69,68 @@ $navItems = [
                     <h1 class="crm-page-title"><?= htmlspecialchars($pageHeading) ?></h1>
                 </div>
                 <div class="crm-topbar-actions">
-                    <label class="crm-top-search">
-                        <i class="bi bi-search"></i>
-                        <input type="search" placeholder="Search finance data..." aria-label="Search finance data" data-global-search>
+                    <label class="crm-top-search crm-top-search-inline">
+                        <span class="crm-search-icon"><i class="bi bi-search"></i></span>
+                        <input type="search" placeholder="Buscar dados financeiros..." aria-label="Buscar dados financeiros" data-global-search>
                     </label>
-                    <button class="crm-icon-btn" type="button" title="Notifications"><i class="bi bi-bell"></i></button>
-                    <button class="crm-icon-btn" type="button" title="Settings"><i class="bi bi-gear"></i></button>
+                    <div class="position-relative">
+                        <button class="crm-icon-btn" type="button" title="Notificações" data-crm-flyout="notifications" aria-expanded="false">
+                            <i class="bi bi-bell"></i>
+                        </button>
+                        <div class="crm-flyout" data-flyout="notifications">
+                            <h6>Notificações</h6>
+                            <div class="crm-flyout-item">
+                                <i class="bi bi-check2-circle mt-1"></i>
+                                <div>
+                                    <strong>Nenhuma pendência</strong>
+                                    <small>Seu painel está atualizado.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="position-relative">
+                        <button class="crm-icon-btn" type="button" title="Configurações" data-crm-flyout="settings" aria-expanded="false">
+                            <i class="bi bi-gear"></i>
+                        </button>
+                        <div class="crm-flyout" data-flyout="settings">
+                            <h6>Configurações</h6>
+                            <a class="crm-flyout-item" href="<?= BASE_URL ?>perfil">
+                                <i class="bi bi-person-badge mt-1"></i>
+                                <div>
+                                    <strong>Meu perfil</strong>
+                                    <small>Editar nome e e-mail.</small>
+                                </div>
+                            </a>
+                            <a class="crm-flyout-item" href="<?= BASE_URL ?>perfil#senha">
+                                <i class="bi bi-shield-lock mt-1"></i>
+                                <div>
+                                    <strong>Senha</strong>
+                                    <small>Atualizar acesso da conta.</small>
+                                </div>
+                            </a>
+                            <a class="crm-flyout-item" href="<?= BASE_URL ?>salario">
+                                <i class="bi bi-cash-stack mt-1"></i>
+                                <div>
+                                    <strong>Salário</strong>
+                                    <small>Ajustar renda mensal.</small>
+                                </div>
+                            </a>
+                            <a class="crm-flyout-item" href="<?= BASE_URL ?>categorias">
+                                <i class="bi bi-tags mt-1"></i>
+                                <div>
+                                    <strong>Categorias</strong>
+                                    <small>Organizar suas classes.</small>
+                                </div>
+                            </a>
+                            <a class="crm-flyout-item" href="<?= BASE_URL ?>auth/logout">
+                                <i class="bi bi-box-arrow-left mt-1"></i>
+                                <div>
+                                    <strong>Sair</strong>
+                                    <small>Encerrar a sessão.</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                     <div class="crm-user-chip">
                         <div class="crm-user-avatar"><?= strtoupper(substr($userName, 0, 1)) ?></div>
                         <div class="crm-user-meta">

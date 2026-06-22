@@ -24,11 +24,16 @@ class Salario extends Model
     public function setSalario($id_usuario, $valor)
     {
         // Verificar se já existe
-        $check = $this->db->prepare("SELECT id FROM salarios WHERE id_usuario = ?");
+        $check = $this->db->prepare("SELECT id, valor FROM salarios WHERE id_usuario = ?");
         $check->bind_param("i", $id_usuario);
         $check->execute();
+        $rowAtual = $check->get_result()->fetch_assoc();
         
-        if ($check->get_result()->num_rows > 0) {
+        if ($rowAtual) {
+            $historico = $this->db->prepare("INSERT INTO salarios_historico (id_usuario, valor) VALUES (?, ?)");
+            $historico->bind_param("id", $id_usuario, $rowAtual['valor']);
+            $historico->execute();
+
             // Atualizar
             $stmt = $this->db->prepare("UPDATE salarios SET valor = ? WHERE id_usuario = ?");
             $stmt->bind_param("di", $valor, $id_usuario);
@@ -37,7 +42,15 @@ class Salario extends Model
             $stmt = $this->db->prepare("INSERT INTO salarios (id_usuario, valor) VALUES (?, ?)");
             $stmt->bind_param("id", $id_usuario, $valor);
         }
-        return $stmt->execute();
+        $sucesso = $stmt->execute();
+
+        if ($sucesso && !$rowAtual) {
+            $historico = $this->db->prepare("INSERT INTO salarios_historico (id_usuario, valor) VALUES (?, ?)");
+            $historico->bind_param("id", $id_usuario, $valor);
+            $historico->execute();
+        }
+
+        return $sucesso;
     }
 
     /**
@@ -53,10 +66,11 @@ class Salario extends Model
      */
     public function getHistorico($id_usuario, $limitar = null)
     {
-        $sql = "SELECT *, DATE_FORMAT(data_atualizacao, '%d/%m/%Y') as data_formatada 
-                FROM salarios 
-                WHERE id_usuario = ? 
-                ORDER BY data_atualizacao DESC";
+        $sql = "SELECT id, id_usuario, valor, data_registro,
+                       DATE_FORMAT(data_registro, '%d/%m/%Y %H:%i') as data_formatada
+                FROM salarios_historico
+                WHERE id_usuario = ?
+                ORDER BY data_registro DESC";
         
         if ($limitar) {
             $sql .= " LIMIT ?";

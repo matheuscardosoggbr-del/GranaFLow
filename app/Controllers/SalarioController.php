@@ -21,9 +21,11 @@ class SalarioController extends Controller
         $id_usuario = $_SESSION['id_usuario'];
         $salarioModel = $this->model('Salario');
         $salario = $salarioModel->getSalario($id_usuario);
+        $historico = $salarioModel->getHistorico($id_usuario, 6);
 
         $data = [
             'salario' => $salario,
+            'historico' => $historico,
             'csrf_token' => $this->gerarTokenCSRF(),
         ];
 

@@ -6,7 +6,7 @@
 
 $tentativa_method = $_POST['method'] ?? 'auto';
 $senha = $_POST['senha'] ?? '';
-$port = $_POST['port'] ?? 3306;
+$port = $_POST['port'] ?? 3308;
 
 ?>
 <!DOCTYPE html>
@@ -29,7 +29,7 @@ $port = $_POST['port'] ?? 3306;
 </head>
 <body>
     <div class="setup-card">
-        <h1 class="mb-3">🔧 Configurar Banco de Dados</h1>
+        <h1 class="mb-3">;;;;;;;;;;;; Configurar Banco de Dados</h1>
         <p class="text-muted">GranaFlow v2.0</p>
 
         <?php

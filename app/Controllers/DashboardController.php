@@ -17,6 +17,7 @@ class DashboardController extends Controller
     {
         $id_usuario     = $_SESSION['id_usuario'];
         $gastoModel     = $this->model('Gasto');
+        $receitaModel   = $this->model('Receita');
         $metaModel      = $this->model('Meta');
         $categoriaModel = $this->model('Categoria');
         $salarioModel   = $this->model('Salario');
@@ -25,6 +26,7 @@ class DashboardController extends Controller
         $gastoModel->gerarRecorrentes($id_usuario);
 
         $gastos      = $gastoModel->getGastos($id_usuario);
+        $receitas    = $receitaModel->getReceitas($id_usuario);
         $metas       = $metaModel->getMetas($id_usuario);
         $categorias  = $categoriaModel->getCategorias($id_usuario);
         $salario     = $salarioModel->getSalario($id_usuario);
@@ -41,6 +43,12 @@ class DashboardController extends Controller
         });
         $total_mes_pontuais = array_sum(array_column($gastos_mes, 'valor'));
 
+        $receitas_mes = array_filter($receitas, function ($r) use ($mes_atual, $ano_atual) {
+            return date('m', strtotime($r['data_receita'])) == $mes_atual
+                && date('Y', strtotime($r['data_receita'])) == $ano_atual;
+        });
+        $total_receitas_mes = array_sum(array_column($receitas_mes, 'valor'));
+
         $total_recorrentes_pendentes = 0;
         foreach ($recorrentes as $r) {
             $ultima   = $r['ultima_execucao'] ? date('Y-m', strtotime($r['ultima_execucao'])) : null;
@@ -54,7 +62,7 @@ class DashboardController extends Controller
         $total_mes         = $total_mes_pontuais + $total_recorrentes_pendentes;
         $total_geral       = array_sum(array_column($gastos, 'valor'));
 
-        $saldo = $salario - $total_mes - $total_guardado;
+        $saldo = $salario + $total_receitas_mes - $total_mes - $total_guardado;
 
         $grafico_saldo = [];
         for ($i = 5; $i >= 0; $i--) {
@@ -68,11 +76,17 @@ class DashboardController extends Controller
             });
             $total_ref = array_sum(array_column($gastos_ref, 'valor'));
 
+            $receitas_ref = array_filter($receitas, function ($r) use ($mes_ref, $ano_ref) {
+                return date('m', strtotime($r['data_receita'])) == $mes_ref
+                    && date('Y', strtotime($r['data_receita'])) == $ano_ref;
+            });
+            $total_receitas_ref = array_sum(array_column($receitas_ref, 'valor'));
+
             if ($i === 0) {
                 $total_ref += $total_recorrentes_pendentes;
-                $saldo_ref  = $salario - $total_ref - $total_guardado;
+                $saldo_ref  = $salario + $total_receitas_ref - $total_ref - $total_guardado;
             } else {
-                $saldo_ref = $salario - $total_ref;
+                $saldo_ref = $salario + $total_receitas_ref - $total_ref;
             }
 
             $grafico_saldo['labels'][]  = $nome_mes;
@@ -87,14 +101,17 @@ class DashboardController extends Controller
 
         $data = [
             'nome_usuario'       => $_SESSION['nome'],
+            'csrf_token'         => $this->gerarTokenCSRF(),
             'salario'            => $salario,
             'total_mes'          => $total_mes,
+            'total_receitas_mes' => $total_receitas_mes,
             'total_geral'        => $total_geral,
             'total_recorrentes'  => $total_recorrentes,
             'total_guardado'     => $total_guardado,
             'historico_guardado' => $historico_guardado,
             'saldo'              => $saldo,
             'gastos'             => $gastos,
+            'receitas'           => $receitas,
             'metas'              => $metas,
             'categorias'         => $categorias,
             'recorrentes'        => $recorrentes,
@@ -130,11 +147,13 @@ class DashboardController extends Controller
     {
         $id_usuario     = $_SESSION['id_usuario'];
         $gastoModel     = $this->model('Gasto');
+        $receitaModel   = $this->model('Receita');
         $metaModel      = $this->model('Meta');
         $salarioModel   = $this->model('Salario');
         $poupancaModel  = $this->model('Poupanca');
 
         $gastos         = $gastoModel->getGastos($id_usuario);
+        $receitas       = $receitaModel->getReceitas($id_usuario);
         $metas          = $metaModel->getMetas($id_usuario);
         $salario        = $salarioModel->getSalario($id_usuario);
         $recorrentes    = $gastoModel->getRecorrentes($id_usuario);
@@ -149,6 +168,11 @@ class DashboardController extends Controller
                 && date('Y', strtotime($g['data_gasto'])) == $ano_atual;
         });
         $total_mes_pontuais = array_sum(array_column($gastos_mes, 'valor'));
+        $receitas_mes = array_filter($receitas, function ($r) use ($mes_atual, $ano_atual) {
+            return date('m', strtotime($r['data_receita'])) == $mes_atual
+                && date('Y', strtotime($r['data_receita'])) == $ano_atual;
+        });
+        $total_receitas_mes = array_sum(array_column($receitas_mes, 'valor'));
 
         $total_recorrentes_pendentes = 0;
         foreach ($recorrentes as $r) {
@@ -161,17 +185,20 @@ class DashboardController extends Controller
 
         $total_mes   = $total_mes_pontuais + $total_recorrentes_pendentes;
         $total_geral = array_sum(array_column($gastos, 'valor'));
-        $saldo       = $salario - $total_mes - $total_guardado;
+        $saldo       = $salario + $total_receitas_mes - $total_mes - $total_guardado;
 
         return [
+            'csrf_token'         => $this->gerarTokenCSRF(),
             'salario'            => $salario,
             'total_mes'          => $total_mes,
+            'total_receitas_mes' => $total_receitas_mes,
             'total_geral'        => $total_geral,
             'total_guardado'     => $total_guardado,
             'saldo'              => $saldo,
             'recorrentes'        => $recorrentes,
             'metas'              => $metas,
             'gastos'             => $gastos,
+            'receitas'           => $receitas,
             'historico_guardado' => $historico_guardado,
         ];
     }

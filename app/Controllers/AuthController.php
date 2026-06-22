@@ -14,6 +14,10 @@ class AuthController extends Controller
 
         $data = ['csrf_token' => $this->gerarTokenCSRF()];
 
+        if (($_GET['status'] ?? '') === 'sucesso') {
+            $data['sucesso'] = 'Conta criada com sucesso. Agora faça login para continuar.';
+        }
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Validar CSRF
             if (empty($_POST['csrf_token']) || !$this->validarTokenCSRF($_POST['csrf_token'])) {

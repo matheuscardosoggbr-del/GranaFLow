@@ -120,6 +120,7 @@ class DashboardAjax {
             'total-mes':  { value: data.total_mes,       colored: false },
             'total-geral':{ value: data.total_geral,     colored: false },
             'salario':    { value: data.salario,         colored: false },
+            'receitas':   { value: data.total_receitas_mes, colored: false },
         };
 
         Object.entries(mappings).forEach(([key, cfg]) => {

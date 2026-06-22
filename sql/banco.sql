@@ -114,6 +114,22 @@ CREATE TABLE IF NOT EXISTS metas (
   FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS salarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  valor DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS salarios_historico (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  valor DECIMAL(10,2) NOT NULL,
+  data_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
 -- ============================================
 -- ÍNDICES PARA OTIMIZAÇÃO
 -- ============================================

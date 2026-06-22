@@ -39,6 +39,11 @@
                 </div>
 
                 <div class="auth-body">
+                    <?php if (isset($sucesso)): ?>
+                        <div class="alert alert-success mb-3">
+                            <i class="bi bi-check-circle me-2"></i><?= htmlspecialchars($sucesso) ?>
+                        </div>
+                    <?php endif; ?>
                     <?php if (isset($erro)): ?>
                         <div class="alert alert-danger mb-3">
                             <i class="bi bi-exclamation-circle me-2"></i><?= htmlspecialchars($erro) ?>

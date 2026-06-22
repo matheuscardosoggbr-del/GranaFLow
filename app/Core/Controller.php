@@ -7,6 +7,9 @@ class Controller
     public function model($model)
     {
         $file = dirname(__DIR__) . '/Models/' . $model . '.php';
+        if (!file_exists($file)) {
+            throw new \RuntimeException("Model não encontrado: {$model}");
+        }
         require_once $file;
         $modelClass = 'App\\Models\\' . $model;
         return new $modelClass();
@@ -15,7 +18,11 @@ class Controller
     public function view($view, $data = [])
     {
         extract($data);
-        require_once dirname(__DIR__) . '/Views/' . $view . '.php';
+        $file = dirname(__DIR__) . '/Views/' . $view . '.php';
+        if (!file_exists($file)) {
+            throw new \RuntimeException("View não encontrada: {$view}");
+        }
+        require_once $file;
     }
 
     /**

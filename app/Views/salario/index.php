@@ -55,6 +55,29 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
                 <li>O saldo no dashboard é calculado como: salário - gastos do mês - dinheiro guardado</li>
             </ul>
         </div>
+
+        <?php if (!empty($historico)): ?>
+            <hr class="my-4">
+            <h6 class="mb-3"><i class="bi bi-clock-history me-2"></i>Histórico recente</h6>
+            <div class="table-responsive">
+                <table class="table table-sm tabela-gastos mb-0">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th class="text-end">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($historico as $item): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($item['data_formatada'] ?? '') ?></td>
+                                <td class="text-end">R$ <?= number_format((float)$item['valor'], 2, ',', '.') ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 

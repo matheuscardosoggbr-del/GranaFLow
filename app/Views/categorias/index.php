@@ -65,17 +65,20 @@ require_once dirname(__DIR__) . '/partials/shell_top.php';
                         <?php foreach ($categorias as $cat): ?>
                             <tr>
                                 <td><strong><?= htmlspecialchars($cat['nome']) ?></strong></td>
-                                <td>
-                                    <span class="badge bg-<?= $cat['tipo_nome'] === 'Receita' ? 'success' : 'danger' ?>">
-                                        <?= $cat['tipo_nome'] ?>
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <form method="POST" action="<?= BASE_URL ?>categoria/deletar/<?= $cat['id_categoria'] ?>" style="display:inline;" onsubmit="return confirm('Deseja deletar esta categoria?');">
-                                        <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger btn-acao">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                        <td>
+                            <span class="badge bg-<?= $cat['tipo_nome'] === 'Receita' ? 'success' : 'danger' ?>">
+                                <?= $cat['tipo_nome'] ?>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a href="<?= BASE_URL ?>categoria/editar/<?= $cat['id_categoria'] ?>" class="btn btn-sm btn-outline-primary btn-acao me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form method="POST" action="<?= BASE_URL ?>categoria/deletar/<?= $cat['id_categoria'] ?>" style="display:inline;" onsubmit="return confirm('Deseja deletar esta categoria?');">
+                                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                                <button type="submit" class="btn btn-sm btn-outline-danger btn-acao">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                                     </form>
                                 </td>
                             </tr>
